@@ -1,0 +1,40 @@
+messages:
+  prefix: "&6[Multitool] "
+  
+  # Komendy
+  commands:
+    help:
+      title: "&6=== Multitool Komendy ==="
+      give: "&e/multitool give <poziom> &7- Daje Multitool o określonym poziomie"
+      reload: "&e/multitool reload &7- Przeładowuje konfigurację pluginu"
+      prestige: "&e/multitool prestige &7- Ulepsza Multitool do poziomu prestiżowego"
+  
+  # Błędy
+  errors:
+    player_only: "&cTa komenda może być użyta tylko przez gracza!"
+    no_permission: "&cNie masz uprawnień do tej komendy!"
+    invalid_level: "&cNieprawidłowy poziom!"
+    level_range: "&cPoziom musi być między 1 a 7!"
+    hold_multitool: "&cMusisz trzymać Multitool w ręce!"
+    give_usage: "&cUżyj: /multitool give <poziom>"
+  
+  # Sukces
+  success:
+    give: "&aOtrzymałeś Multitool poziomu {level}!"
+    prestige: "&aTwój Multitool został ulepszony do poziomu prestiżowego!"
+    reload: "&aKonfiguracja pluginu została przeładowana!"
+  
+  # Informacje o przedmiocie
+  item:
+    name: "&6Multitool &7Poziom {level}"
+    lore:
+      level: "&7Poziom: {level}"
+      efficiency: "&7Wydajność: {efficiency}"
+      fortune: "&7Fortuna: {fortune}"
+      bonuses_title: "&6Bonusy:"
+      bonus: "&7- {bonus}"
+
+  # Plugin
+  plugin:
+    enabled: "&aPlugin został włączony!"
+    disabled: "&cPlugin został wyłączony!" 

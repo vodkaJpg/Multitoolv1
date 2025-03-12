@@ -1,0 +1,44 @@
+multitool:
+  levels:
+    1:
+      efficiency: 1
+      fortune: 0
+      bonuses: []
+    2:
+      efficiency: 2
+      fortune: 1
+      bonuses: []
+    3:
+      efficiency: 3
+      fortune: 1
+      bonuses:
+        - "0.1% szansy na otrzymanie bloku żelaza"
+    4:
+      efficiency: 4
+      fortune: 2
+      bonuses: []
+    5:
+      efficiency: 5
+      fortune: 3
+      bonuses:
+        - "Auto-smelting (rudę żelaza i złota przekształca w sztabki)"
+    6:
+      efficiency: 6
+      fortune: 3
+      bonuses: []
+    7:
+      efficiency: 7
+      fortune: 4
+      bonuses: []
+    prestige:
+      efficiency: 10
+      fortune: 5
+      bonuses:
+        - "0.1% szansy na otrzymanie bloku złota"
+
+settings:
+  max-level: 7
+  prestige-enabled: true
+  auto-smelt-enabled: true
+  iron-block-chance: 0.001
+  gold-block-chance: 0.001 
