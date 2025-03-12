@@ -49,7 +49,11 @@ public class MessageManager {
     }
 
     public String getPrefix() {
-        return getMessage("prefix");
+        String prefix = messages.getString("messages.prefix");
+        if (prefix == null) {
+            return "&6[Multitool]";
+        }
+        return ChatColor.translateAlternateColorCodes('&', prefix);
     }
 
     public String getCommandMessage(String path) {

@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Random;
 
 public class Multitool extends JavaPlugin {
+    private static Multitool instance;
     private FileConfiguration config;
     private Random random;
     private CommandManager commandManager;
@@ -18,12 +19,16 @@ public class Multitool extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+        
         // Zapisz domyślną konfigurację
         saveDefaultConfig();
-        config = getConfig();
-        random = new Random();
         
-        // Inicjalizacja managerów
+        // Załaduj konfigurację
+        config = getConfig();
+        
+        // Inicjalizacja menedżerów
+        random = new Random();
         messageManager = new MessageManager(this);
         itemUtils = new ItemUtils(this);
         
@@ -37,12 +42,17 @@ public class Multitool extends JavaPlugin {
         getCommand("multitool").setExecutor(commandManager);
         getCommand("multitool").setTabCompleter(commandManager);
         
+        // Log włączenia pluginu
         getLogger().info(messageManager.getPrefix() + messageManager.getMessage("plugin.enabled"));
     }
 
     @Override
     public void onDisable() {
-        getLogger().info(messageManager.getPrefix() + messageManager.getMessage("plugin.disabled"));
+        if (messageManager != null) {
+            getLogger().info(messageManager.getPrefix() + messageManager.getMessage("plugin.disabled"));
+        } else {
+            getLogger().info("Plugin został wyłączony!");
+        }
     }
 
     public boolean hasChance(double chance) {
@@ -59,5 +69,21 @@ public class Multitool extends JavaPlugin {
 
     public ItemUtils getItemUtils() {
         return itemUtils;
+    }
+
+    public static Multitool getInstance() {
+        return instance;
+    }
+
+    public FileConfiguration getPluginConfig() {
+        return config;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 }
