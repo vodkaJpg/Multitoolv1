@@ -1,0 +1,5 @@
+name: Multitool
+version: '1.0'
+author: Vodka_jpg
+main: org.VodkaJpg.multitool.Multitool
+api-version: '1.21'
