@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Multitool:jar">
+    <output-path>$USER_HOME$/Desktop/serwer/plugins</output-path>
+    <root id="archive" name="Multitool.jar">
+      <element id="module-output" name="Multitool" />
+    </root>
+  </artifact>
+</component>
