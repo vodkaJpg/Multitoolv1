@@ -32,10 +32,16 @@ public class MultitoolListener implements Listener {
 
         // Zwiększ licznik wykopanych bloków
         String playerName = event.getPlayer().getName();
-        blocksMined.put(playerName, blocksMined.getOrDefault(playerName, 0L) + 1);
+        long blocks = blocksMined.getOrDefault(playerName, 0L) + 1;
+        blocksMined.put(playerName, blocks);
+
+        // Aktualizuj opis przedmiotu
+        int level = plugin.getItemUtils().getMultitoolLevel(tool);
+        ItemStack updatedTool = plugin.getItemUtils().createMultitool(level, blocks);
+        event.getPlayer().getInventory().setItemInMainHand(updatedTool);
 
         // Sprawdź czy gracz może awansować na następny poziom
-        checkLevelUp(event.getPlayer(), tool);
+        checkLevelUp(event.getPlayer(), updatedTool);
 
         // Zastosuj bonusy w zależności od poziomu
         applyBonuses(event);
@@ -60,7 +66,7 @@ public class MultitoolListener implements Listener {
             blocksMined.put(playerName, 0L);
             
             // Zwiększ poziom
-            ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1);
+            ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1, 0);
             player.getInventory().setItemInMainHand(newTool);
             
             // Wyślij wiadomość o awansie

@@ -79,4 +79,9 @@ public class MessageManager {
     public String getItemMessage(String path, Map<String, String> replacements) {
         return getMessage("item." + path, replacements);
     }
+
+    private String colorize(String message) {
+        if (message == null) return "";
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
 } 

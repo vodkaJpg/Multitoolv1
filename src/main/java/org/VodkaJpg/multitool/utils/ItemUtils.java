@@ -20,7 +20,7 @@ public class ItemUtils {
         this.plugin = plugin;
     }
 
-    public ItemStack createMultitool(int level) {
+    public ItemStack createMultitool(int level, long blocksMined) {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta meta = item.getItemMeta();
         
@@ -35,15 +35,6 @@ public class ItemUtils {
         
         // Pobierz enchanty
         List<String> enchantments = levelConfig.getStringList("enchantments");
-        for (String enchant : enchantments) {
-            String[] parts = enchant.split(":");
-            if (parts.length == 2) {
-                Enchantment enchantment = Enchantment.getByName(parts[0]);
-                if (enchantment != null) {
-                    meta.addEnchant(enchantment, Integer.parseInt(parts[1]), true);
-                }
-            }
-        }
         
         // Pobierz bonusy
         List<String> bonuses = levelConfig.getStringList("bonuses");
@@ -54,25 +45,22 @@ public class ItemUtils {
         // Ustaw lore
         List<String> lore = new ArrayList<>();
         
-        // Dodaj poziom
-        Map<String, String> levelReplacements = new HashMap<>();
-        levelReplacements.put("level", String.valueOf(level));
-        lore.add(plugin.getMessageManager().getItemMessage("lore.level", levelReplacements));
+        // Dodaj sekcję enchantów
+        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
+        for (String enchant : enchantments) {
+            String[] parts = enchant.split(":");
+            if (parts.length == 2) {
+                Enchantment enchantment = Enchantment.getByName(parts[0]);
+                if (enchantment != null) {
+                    meta.addEnchant(enchantment, Integer.parseInt(parts[1]), true);
+                    Map<String, String> enchantReplacements = new HashMap<>();
+                    enchantReplacements.put("enchantment", enchantment.getKey().getKey() + " " + parts[1]);
+                    lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+                }
+            }
+        }
         
-        // Dodaj wydajność
-        Map<String, String> efficiencyReplacements = new HashMap<>();
-        efficiencyReplacements.put("efficiency", String.valueOf(levelConfig.getInt("efficiency")));
-        lore.add(plugin.getMessageManager().getItemMessage("lore.efficiency", efficiencyReplacements));
-        
-        // Dodaj fortunę
-        Map<String, String> fortuneReplacements = new HashMap<>();
-        fortuneReplacements.put("fortune", String.valueOf(levelConfig.getInt("fortune")));
-        lore.add(plugin.getMessageManager().getItemMessage("lore.fortune", fortuneReplacements));
-        
-        // Dodaj wymagane bloki
-        lore.add("&7Wymagane bloki do następnego poziomu: &e" + formatNumber(requiredBlocks));
-        
-        // Dodaj bonusy
+        // Dodaj sekcję bonusów
         if (!bonuses.isEmpty()) {
             lore.add("");
             lore.add(plugin.getMessageManager().getItemMessage("lore.bonuses_title"));
@@ -83,11 +71,24 @@ public class ItemUtils {
             }
         }
         
+        // Dodaj informacje o blokach
+        lore.add("");
+        Map<String, String> blocksReplacements = new HashMap<>();
+        blocksReplacements.put("blocks", formatNumber(requiredBlocks));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.blocks_needed", blocksReplacements));
+        
+        blocksReplacements.put("blocks", formatNumber(blocksMined));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.blocks_mined", blocksReplacements));
+        
         meta.setLore(lore);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         
         return item;
+    }
+
+    public ItemStack createMultitool(int level) {
+        return createMultitool(level, 0);
     }
 
     public boolean isMultitool(ItemStack item) {

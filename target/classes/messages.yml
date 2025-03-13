@@ -1,39 +1,49 @@
 messages:
-  prefix: "&6[Multitool] "
+  prefix: "&6[Multitool]"
   
   # Komendy
   commands:
     help:
-      title: "&6=== Multitool Komendy ==="
-      give: "&e/multitool give <poziom> &7- Daje Multitool o określonym poziomie"
-      reload: "&e/multitool reload &7- Przeładowuje konfigurację pluginu"
-      prestige: "&e/multitool prestige &7- Ulepsza Multitool do poziomu prestiżowego"
+      - "&6=== Multitool - Pomoc ==="
+      - "&e/multitool give &7- Otrzymaj Multitool"
+      - "&e/multitool prestige &7- Awansuj na następny poziom prestiżu"
+      - "&e/multitool reload &7- Przeładuj konfigurację"
+    give:
+      - "&7Użycie: &e/multitool give [gracz] [poziom]"
+    prestige:
+      - "&7Użycie: &e/multitool prestige"
+    reload:
+      - "&7Użycie: &e/multitool reload"
   
   # Błędy
   errors:
     player_only: "&cTa komenda może być użyta tylko przez gracza!"
-    no_permission: "&cNie masz uprawnień do tej komendy!"
-    invalid_level: "&cNieprawidłowy poziom!"
-    level_range: "&cPoziom musi być między 1 a 7!"
-    hold_multitool: "&cMusisz trzymać Multitool w ręce!"
+    no_permission: "&cNie masz uprawnień do użycia tej komendy!"
+    player_not_found: "&cNie znaleziono gracza!"
+    invalid_level: "&cNieprawidłowy poziom! Dostępne poziomy: 1-7"
+    already_has_multitool: "&cTen gracz już posiada Multitool!"
+    no_multitool: "&cNie posiadasz Multitool!"
+    max_level: "&cOsiągnąłeś maksymalny poziom Multitool!"
+    max_prestige: "&cOsiągnąłeś maksymalny poziom prestiżu!"
     give_usage: "&cUżyj: /multitool give <poziom>"
   
   # Sukces
   success:
-    give: "&aOtrzymałeś Multitool poziomu {level}!"
-    prestige: "&aTwój Multitool został ulepszony do poziomu prestiżowego!"
-    reload: "&aKonfiguracja pluginu została przeładowana!"
+    give: "&aPomyślnie nadano Multitool graczowi {player}!"
+    prestige: "&aGratulacje! Twój Multitool awansował na poziom prestiżu {level}!"
+    reload: "&aPomyślnie przeładowano konfigurację!"
     level_up: "&aGratulacje! Twój Multitool awansował na poziom {level}!"
   
   # Informacje o przedmiocie
   item:
-    name: "&6Multitool &7Poziom {level}"
+    name: "&6MultiTool &7[Poziom {level}]"
     lore:
-      level: "&7Poziom: {level}"
-      efficiency: "&7Wydajność: {efficiency}"
-      fortune: "&7Fortuna: {fortune}"
+      enchantments_title: "&6Enchanty:"
+      enchantment: "&7- {enchantment}"
       bonuses_title: "&6Bonusy:"
       bonus: "&7- {bonus}"
+      blocks_needed: "&7Potrzebne bloki do następnego lvl: &e{blocks}"
+      blocks_mined: "&7Wykopane bloki: &e{blocks}"
 
   # Plugin
   plugin:
