@@ -22,6 +22,10 @@ public class ItemUtils {
         this.plugin = plugin;
     }
 
+    public ItemStack createMultitool(int level) {
+        return createMultitool(level, 0);
+    }
+
     public ItemStack createMultitool(int toolLevel, long blocksMined) {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta meta = item.getItemMeta();
@@ -36,50 +40,36 @@ public class ItemUtils {
         ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + toolLevel);
         if (levelConfig == null) return item;
         
-        // Pobierz enchanty
-        List<String> enchantments = levelConfig.getStringList("enchantments");
-        
-        // Pobierz bonusy
-        List<String> bonuses = levelConfig.getStringList("bonuses");
-        
-        // Pobierz wymagane bloki
-        long requiredBlocks = levelConfig.getLong("required_blocks", 0);
-        
-        // Ustaw lore
         List<String> lore = new ArrayList<>();
         
         // Dodaj sekcję enchantów
-        if (!enchantments.isEmpty()) {
-            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
-            for (String enchant : enchantments) {
-                String[] parts = enchant.split(":");
-                if (parts.length == 3 && parts[0].equals("minecraft")) {
-                    String enchantName = parts[1];
-                    try {
-                        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
-                        if (enchantment != null) {
-                            int enchantLevel = Integer.parseInt(parts[2]);
-                            if (meta.addEnchant(enchantment, enchantLevel, true)) {
-                                Map<String, String> enchantReplacements = new HashMap<>();
-                                // Formatuj nazwę enchantu dla wyświetlania
-                                String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
-                                enchantReplacements.put("enchantment", displayName + " " + toRomanNumeral(enchantLevel));
-                                lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
-                                plugin.getLogger().info("Dodano enchant: " + enchantName + " poziom " + enchantLevel);
-                            } else {
-                                plugin.getLogger().warning("Nieznany enchant: " + enchantName);
-                            }
-                        } else {
-                            plugin.getLogger().warning("Nieznany enchant: " + enchantName);
-                        }
-                    } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Nieprawidłowy enchant lub poziom: " + enchant + " (" + e.getMessage() + ")");
+        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
+        List<String> enchantments = levelConfig.getStringList("enchantments");
+        for (String enchant : enchantments) {
+            String[] parts = enchant.split(":");
+            if (parts.length == 3 && parts[0].equals("minecraft")) {
+                String enchantName = parts[1];
+                try {
+                    int enchantLevel = Integer.parseInt(parts[2]);
+                    Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
+                    if (enchantment != null) {
+                        meta.addEnchant(enchantment, enchantLevel, true);
+                        Map<String, String> enchantReplacements = new HashMap<>();
+                        String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
+                        enchantReplacements.put("enchantment", displayName + " " + toRomanNumeral(enchantLevel));
+                        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+                        plugin.getLogger().info("Dodano enchant: " + enchantName + " poziom " + enchantLevel);
+                    } else {
+                        plugin.getLogger().warning("Nie znaleziono enchantu: " + enchantName);
                     }
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Nieprawidłowy poziom enchantu: " + enchant);
                 }
             }
         }
         
         // Dodaj sekcję bonusów
+        List<String> bonuses = levelConfig.getStringList("bonuses");
         if (!bonuses.isEmpty()) {
             lore.add("");
             lore.add(plugin.getMessageManager().getItemMessage("lore.bonuses_title"));
@@ -90,20 +80,14 @@ public class ItemUtils {
             }
         }
         
-        // Dodaj poziom
-        lore.add("");
-        Map<String, String> levelReplacements = new HashMap<>();
-        levelReplacements.put("level", String.valueOf(toolLevel));
-        lore.add(plugin.getMessageManager().getItemMessage("lore.level", levelReplacements));
-        
         // Dodaj informacje o blokach
+        lore.add("");
         Map<String, String> blocksReplacements = new HashMap<>();
         blocksReplacements.put("blocks", formatNumber(blocksMined));
-        blocksReplacements.put("required_blocks", formatNumber(requiredBlocks));
+        blocksReplacements.put("required_blocks", formatNumber(levelConfig.getLong("required_blocks")));
         lore.add(plugin.getMessageManager().getItemMessage("lore.blocks_mined", blocksReplacements));
         
         // Dodaj informację o łącznej ilości bloków
-        lore.add("");
         Map<String, String> totalBlocksReplacements = new HashMap<>();
         long totalBlocks = calculateTotalBlocks(toolLevel - 1) + blocksMined;
         totalBlocksReplacements.put("total_blocks", formatNumber(totalBlocks));
@@ -124,52 +108,6 @@ public class ItemUtils {
             }
         }
         return total;
-    }
-
-    public ItemStack createMultitool(int level) {
-        ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
-        ItemMeta meta = item.getItemMeta();
-
-        if (meta != null) {
-            meta.setDisplayName(plugin.getMessageManager().getItemMessage("name", Map.of("level", String.valueOf(level))));
-            List<String> lore = new ArrayList<>();
-
-            // Dodaj enchanty
-            ConfigurationSection levelSection = plugin.getMultitoolConfig().getConfigurationSection("levels." + level);
-            if (levelSection != null) {
-                List<String> enchants = levelSection.getStringList("enchantments");
-                for (String enchant : enchants) {
-                    String[] parts = enchant.split(":");
-                    if (parts.length == 3) {
-                        String enchantName = parts[1];
-                        int enchantLevel = Integer.parseInt(parts[2]);
-                        
-                        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
-                        if (enchantment != null) {
-                            meta.addEnchant(enchantment, enchantLevel, true);
-                            String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
-                            lore.add(ChatColor.GRAY + displayName + " " + toRomanNumeral(enchantLevel));
-                        } else {
-                            plugin.getLogger().warning("Unknown enchantment: " + enchantName);
-                        }
-                    }
-                }
-            }
-
-            // Dodaj bonusy
-            List<String> bonuses = levelSection.getStringList("bonuses");
-            if (!bonuses.isEmpty()) {
-                lore.add(plugin.getMessageManager().getItemMessage("item.bonuses"));
-                for (String bonus : bonuses) {
-                    lore.add(ChatColor.GRAY + bonus);
-                }
-            }
-
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-        }
-
-        return item;
     }
 
     public boolean isMultitool(ItemStack item) {
