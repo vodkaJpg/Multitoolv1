@@ -9,17 +9,24 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.ChatColor;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class ItemUtils {
     private final Multitool plugin;
+    private final NamespacedKey toolIdKey;
+    private final NamespacedKey blocksMineKey;
 
     public ItemUtils(Multitool plugin) {
         this.plugin = plugin;
+        this.toolIdKey = new NamespacedKey(plugin, "tool_id");
+        this.blocksMineKey = new NamespacedKey(plugin, "blocks_mined");
     }
 
     public ItemStack createMultitool(int level) {
@@ -30,6 +37,12 @@ public class ItemUtils {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
+        
+        // Dodaj unikalny identyfikator narzędzia
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String toolId = UUID.randomUUID().toString();
+        container.set(toolIdKey, PersistentDataType.STRING, toolId);
+        container.set(blocksMineKey, PersistentDataType.LONG, blocksMined);
         
         // Ustaw nazwę przedmiotu
         Map<String, String> nameReplacements = new HashMap<>();
@@ -42,23 +55,33 @@ public class ItemUtils {
         
         List<String> lore = new ArrayList<>();
         
+        // Logowanie debugowania dla enchantu
+        plugin.getLogger().info("Tworzenie Multitool na poziomie " + toolLevel);
+        
         // Dodaj sekcję enchantów
         lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
         List<String> enchantments = levelConfig.getStringList("enchantments");
+        plugin.getLogger().info("Znalezione enchanty: " + enchantments.toString());
+        
         for (String enchant : enchantments) {
             String[] parts = enchant.split(":");
             if (parts.length == 3 && parts[0].equals("minecraft")) {
                 String enchantName = parts[1];
                 try {
                     int enchantLevel = Integer.parseInt(parts[2]);
+                    plugin.getLogger().info("Próba dodania enchantu: " + enchantName + " poziom " + enchantLevel);
+                    
                     Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
                     if (enchantment != null) {
-                        meta.addEnchant(enchantment, enchantLevel, true);
+                        // Dodaj enchant do przedmiotu
+                        boolean added = meta.addEnchant(enchantment, enchantLevel, true);
+                        
+                        // Dodaj informacje o enchancie do lore
                         Map<String, String> enchantReplacements = new HashMap<>();
                         String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
                         enchantReplacements.put("enchantment", displayName + " " + toRomanNumeral(enchantLevel));
                         lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
-                        plugin.getLogger().info("Dodano enchant: " + enchantName + " poziom " + enchantLevel);
+                        plugin.getLogger().info("Dodano enchant: " + enchantName + " poziom " + enchantLevel + " (sukces: " + added + ")");
                     } else {
                         plugin.getLogger().warning("Nie znaleziono enchantu: " + enchantName);
                     }
@@ -96,7 +119,42 @@ public class ItemUtils {
         meta.setLore(lore);
         item.setItemMeta(meta);
         
+        // Sprawdź czy enchanty zostały dodane
+        plugin.getLogger().info("Utworzono Multitool z enchantami: " + item.getEnchantments().toString());
+        
         return item;
+    }
+
+    public void updateBlocksMined(ItemStack item, long newBlocksMined) {
+        if (!isMultitool(item)) return;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        container.set(blocksMineKey, PersistentDataType.LONG, newBlocksMined);
+        
+        int level = getMultitoolLevel(item);
+        ItemStack updatedItem = createMultitool(level, newBlocksMined);
+        item.setItemMeta(updatedItem.getItemMeta());
+    }
+
+    public long getBlocksMined(ItemStack item) {
+        if (!isMultitool(item)) return 0;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return 0;
+
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        Long blocksMined = container.get(blocksMineKey, PersistentDataType.LONG);
+        return blocksMined != null ? blocksMined : 0;
+    }
+
+    public String getToolId(ItemStack item) {
+        if (!isMultitool(item)) return null;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return null;
+
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        return container.get(toolIdKey, PersistentDataType.STRING);
     }
 
     private long calculateTotalBlocks(int level) {

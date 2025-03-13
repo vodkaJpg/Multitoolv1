@@ -4,6 +4,7 @@ import org.VodkaJpg.multitool.Multitool;
 import org.VodkaJpg.multitool.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -16,7 +17,6 @@ import java.util.Map;
 
 public class MultitoolListener implements Listener {
     private final Multitool plugin;
-    private final Map<String, Long> blocksMined = new HashMap<>();
 
     public MultitoolListener(Multitool plugin) {
         this.plugin = plugin;
@@ -24,55 +24,38 @@ public class MultitoolListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
-        if (!plugin.getItemUtils().isMultitool(tool)) return;
+        Player player = event.getPlayer();
+        ItemStack item = player.getInventory().getItemInMainHand();
 
-        // Zmień typ narzędzia w zależności od bloku
-        changeToolType(tool, event.getBlock());
-
-        // Zwiększ licznik wykopanych bloków
-        String playerName = event.getPlayer().getName();
-        long blocks = blocksMined.getOrDefault(playerName, 0L) + 1;
-        blocksMined.put(playerName, blocks);
-
-        // Aktualizuj opis przedmiotu
-        int level = plugin.getItemUtils().getMultitoolLevel(tool);
-        ItemStack updatedTool = plugin.getItemUtils().createMultitool(level, blocks);
-        event.getPlayer().getInventory().setItemInMainHand(updatedTool);
-
-        // Sprawdź czy gracz może awansować na następny poziom
-        checkLevelUp(event.getPlayer(), updatedTool);
-
-        // Zastosuj bonusy w zależności od poziomu
-        applyBonuses(event);
-    }
-
-    private void checkLevelUp(org.bukkit.entity.Player player, ItemStack tool) {
-        int currentLevel = plugin.getItemUtils().getMultitoolLevel(tool);
-        if (currentLevel >= 7) return; // Maksymalny poziom
-
-        String playerName = player.getName();
-        long blocks = blocksMined.getOrDefault(playerName, 0L);
-        
-        // Pobierz wymagane bloki dla następnego poziomu
-        ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + currentLevel);
-        if (levelConfig == null) return;
-        
-        long requiredBlocks = levelConfig.getLong("required_blocks", 0);
-        
-        // Sprawdź czy gracz może awansować
-        if (blocks >= requiredBlocks) {
-            // Zresetuj licznik bloków
-            blocksMined.put(playerName, 0L);
+        if (plugin.getItemUtils().isMultitool(item)) {
+            // Zmień typ narzędzia w zależności od bloku
+            changeToolType(item, event.getBlock());
             
-            // Zwiększ poziom
-            ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1, 0);
-            player.getInventory().setItemInMainHand(newTool);
+            // Pobierz aktualne statystyki narzędzia
+            long blocksMined = plugin.getItemUtils().getBlocksMined(item);
+            int currentLevel = plugin.getItemUtils().getMultitoolLevel(item);
             
-            // Wyślij wiadomość o awansie
-            Map<String, String> replacements = new HashMap<>();
-            replacements.put("level", String.valueOf(currentLevel + 1));
-            player.sendMessage(plugin.getMessageManager().getSuccess("level_up", replacements));
+            // Zwiększ licznik wykopanych bloków
+            blocksMined++;
+            
+            // Sprawdź, czy narzędzie powinno zostać ulepszone
+            long requiredBlocks = plugin.getConfig().getLong("levels." + currentLevel + ".required_blocks", 0);
+            if (blocksMined >= requiredBlocks && currentLevel < 7) {
+                // Utwórz nowe narzędzie o wyższym poziomie
+                ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1, 0);
+                player.getInventory().setItemInMainHand(newTool);
+                
+                // Wyślij wiadomość o ulepszeniu
+                Map<String, String> replacements = new HashMap<>();
+                replacements.put("level", String.valueOf(currentLevel + 1));
+                player.sendMessage(plugin.getMessageManager().getMessage("success.level_up", replacements));
+            } else {
+                // Zaktualizuj statystyki narzędzia
+                plugin.getItemUtils().updateBlocksMined(item, blocksMined);
+            }
+            
+            // Zastosuj bonusy w zależności od poziomu
+            applyBonuses(event);
         }
     }
 
@@ -97,7 +80,8 @@ public class MultitoolListener implements Listener {
     }
 
     private void applyBonuses(BlockBreakEvent event) {
-        ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
+        Player player = event.getPlayer();
+        ItemStack tool = player.getInventory().getItemInMainHand();
         int level = plugin.getItemUtils().getMultitoolLevel(tool);
         Block block = event.getBlock();
         
@@ -114,9 +98,11 @@ public class MultitoolListener implements Listener {
         }
         if (level >= 5) {
             if (block.getType() == Material.IRON_ORE) {
+                event.setDropItems(false);
                 event.setExpToDrop(0);
                 event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.IRON_INGOT));
             } else if (block.getType() == Material.GOLD_ORE) {
+                event.setDropItems(false);
                 event.setExpToDrop(0);
                 event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.GOLD_INGOT));
             }

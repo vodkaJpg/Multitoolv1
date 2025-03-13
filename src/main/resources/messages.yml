@@ -35,7 +35,7 @@ messages:
   item:
     name: "&6MultiTool &7[Poziom {level}]"
     lore:
-      enchantments_title: "&eEnchantments:"
+      enchantments_title: "&eZaklęcia:"
       enchantment: "&7- {enchantment}"
       bonuses_title: "&6Bonusy:"
       bonus: "&7- {bonus}"
