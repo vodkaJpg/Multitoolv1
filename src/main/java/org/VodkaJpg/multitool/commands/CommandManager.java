@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
     private final Multitool plugin;
@@ -41,8 +43,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 break;
             case "reload":
                 if (player.hasPermission("multitool.admin")) {
-                    plugin.reloadConfig();
-                    plugin.getMessageManager().loadMessages();
+                    plugin.reloadConfigs();
                     player.sendMessage(plugin.getMessageManager().getSuccess("reload"));
                 } else {
                     player.sendMessage(plugin.getMessageManager().getError("no_permission"));
@@ -62,18 +63,36 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 2) {
-            player.sendMessage(plugin.getMessageManager().getError("give_usage"));
+            player.sendMessage(plugin.getMessageManager().getCommandMessage("give"));
             return;
         }
 
         try {
             int level = Integer.parseInt(args[1]);
             if (level < 1 || level > 7) {
-                player.sendMessage(plugin.getMessageManager().getError("level_range"));
+                player.sendMessage(plugin.getMessageManager().getError("invalid_level"));
                 return;
             }
-            player.getInventory().addItem(plugin.getItemUtils().createMultitool(level));
-            player.sendMessage(plugin.getMessageManager().getSuccess("give").replace("{level}", String.valueOf(level)));
+
+            Player target = player;
+            if (args.length > 2) {
+                target = plugin.getServer().getPlayer(args[2]);
+                if (target == null) {
+                    player.sendMessage(plugin.getMessageManager().getError("player_not_found"));
+                    return;
+                }
+            }
+
+            target.getInventory().addItem(plugin.getItemUtils().createMultitool(level));
+            
+            Map<String, String> replacements = new HashMap<>();
+            replacements.put("player", target.getName());
+            replacements.put("level", String.valueOf(level));
+            player.sendMessage(plugin.getMessageManager().getSuccess("give", replacements));
+            
+            if (target != player) {
+                target.sendMessage(plugin.getMessageManager().getSuccess("received", replacements));
+            }
         } catch (NumberFormatException e) {
             player.sendMessage(plugin.getMessageManager().getError("invalid_level"));
         }
@@ -85,22 +104,27 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return;
         }
 
-        if (plugin.getItemUtils().isMultitool(player.getInventory().getItemInMainHand())) {
-            player.getInventory().setItemInMainHand(plugin.getItemUtils().createMultitool(8)); // 8 to poziom prestiżowy
-            player.sendMessage(plugin.getMessageManager().getSuccess("prestige"));
-        } else {
-            player.sendMessage(plugin.getMessageManager().getError("hold_multitool"));
+        if (!plugin.getItemUtils().isMultitool(player.getInventory().getItemInMainHand())) {
+            player.sendMessage(plugin.getMessageManager().getError("no_multitool"));
+            return;
         }
+
+        int currentLevel = plugin.getItemUtils().getMultitoolLevel(player.getInventory().getItemInMainHand());
+        if (currentLevel < 7) {
+            player.sendMessage(plugin.getMessageManager().getError("max_level"));
+            return;
+        }
+
+        player.getInventory().setItemInMainHand(plugin.getItemUtils().createMultitool(8)); // 8 to poziom prestiżowy
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("level", "Prestige");
+        player.sendMessage(plugin.getMessageManager().getSuccess("prestige", replacements));
     }
 
     private void sendHelp(Player player) {
-        player.sendMessage(plugin.getMessageManager().getCommandMessage("help.title"));
-        if (player.hasPermission("multitool.admin")) {
-            player.sendMessage(plugin.getMessageManager().getCommandMessage("help.give"));
-            player.sendMessage(plugin.getMessageManager().getCommandMessage("help.reload"));
-        }
-        if (player.hasPermission("multitool.prestige")) {
-            player.sendMessage(plugin.getMessageManager().getCommandMessage("help.prestige"));
+        String helpMessage = plugin.getMessageManager().getCommandMessage("help");
+        for (String line : helpMessage.split("\n")) {
+            player.sendMessage(line);
         }
     }
 
@@ -109,9 +133,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            completions.addAll(Arrays.asList("give", "prestige"));
             if (sender.hasPermission("multitool.admin")) {
-                completions.add("reload");
+                completions.addAll(Arrays.asList("give", "reload"));
+            }
+            if (sender.hasPermission("multitool.prestige")) {
+                completions.add("prestige");
             }
             return completions;
         }
@@ -120,6 +146,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             for (int i = 1; i <= 7; i++) {
                 completions.add(String.valueOf(i));
             }
+            return completions;
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("give") && sender.hasPermission("multitool.admin")) {
+            plugin.getServer().getOnlinePlayers().forEach(player -> completions.add(player.getName()));
             return completions;
         }
 

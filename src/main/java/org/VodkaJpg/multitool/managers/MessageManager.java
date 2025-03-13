@@ -11,14 +11,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MessageManager {
-    private FileConfiguration messages;
+    private final FileConfiguration messages;
 
     public MessageManager(FileConfiguration messages) {
         this.messages = messages;
     }
 
     public String getMessage(String path) {
-        return messages.getString(path, "Nie znaleziono wiadomości: " + path);
+        String message = messages.getString(path, "Nie znaleziono wiadomości: " + path);
+        return colorize(message);
     }
 
     public String getMessage(String path, Map<String, String> replacements) {
@@ -26,7 +27,7 @@ public class MessageManager {
         for (Map.Entry<String, String> replacement : replacements.entrySet()) {
             message = message.replace("{" + replacement.getKey() + "}", replacement.getValue());
         }
-        return message;
+        return colorize(message);
     }
 
     public String getSuccess(String path) {
@@ -38,11 +39,7 @@ public class MessageManager {
     }
 
     public String getPrefix() {
-        String prefix = messages.getString("messages.prefix");
-        if (prefix == null) {
-            return "&6[Multitool]";
-        }
-        return ChatColor.translateAlternateColorCodes('&', prefix);
+        return getMessage("messages.prefix");
     }
 
     public String getCommandMessage(String path) {

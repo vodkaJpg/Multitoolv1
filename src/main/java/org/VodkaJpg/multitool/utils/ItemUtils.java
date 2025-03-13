@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class ItemUtils {
         // Ustaw nazwę przedmiotu
         Map<String, String> nameReplacements = new HashMap<>();
         nameReplacements.put("level", String.valueOf(level));
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("name", nameReplacements)));
+        meta.setDisplayName(plugin.getMessageManager().getItemMessage("name", nameReplacements));
         
         // Pobierz konfigurację dla danego poziomu
         ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + level);
@@ -47,7 +46,7 @@ public class ItemUtils {
         List<String> lore = new ArrayList<>();
         
         // Dodaj sekcję enchantów
-        lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.enchantments_title")));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
         for (String enchant : enchantments) {
             String[] parts = enchant.split(":");
             if (parts.length == 2) {
@@ -58,7 +57,7 @@ public class ItemUtils {
                     String enchantName = enchantment.getKey().getKey().toLowerCase();
                     enchantName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1);
                     enchantReplacements.put("enchantment", enchantName + " " + parts[1]);
-                    lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements)));
+                    lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
                 }
             }
         }
@@ -66,11 +65,11 @@ public class ItemUtils {
         // Dodaj sekcję bonusów
         if (!bonuses.isEmpty()) {
             lore.add("");
-            lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.bonuses_title")));
+            lore.add(plugin.getMessageManager().getItemMessage("lore.bonuses_title"));
             for (String bonus : bonuses) {
                 Map<String, String> bonusReplacements = new HashMap<>();
                 bonusReplacements.put("bonus", bonus);
-                lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.bonus", bonusReplacements)));
+                lore.add(plugin.getMessageManager().getItemMessage("lore.bonus", bonusReplacements));
             }
         }
         
@@ -78,21 +77,20 @@ public class ItemUtils {
         lore.add("");
         Map<String, String> levelReplacements = new HashMap<>();
         levelReplacements.put("level", String.valueOf(level));
-        lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.level", levelReplacements)));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.level", levelReplacements));
         
         // Dodaj informacje o blokach
         Map<String, String> blocksReplacements = new HashMap<>();
         blocksReplacements.put("blocks", formatNumber(blocksMined));
         blocksReplacements.put("required_blocks", formatNumber(requiredBlocks));
-        lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.blocks_mined", blocksReplacements)));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.blocks_mined", blocksReplacements));
         
         // Dodaj informację o łącznej ilości bloków
         lore.add("");
         Map<String, String> totalBlocksReplacements = new HashMap<>();
-        // Oblicz łączną ilość bloków z poprzednich poziomów
         long totalBlocks = calculateTotalBlocks(level - 1) + blocksMined;
         totalBlocksReplacements.put("total_blocks", formatNumber(totalBlocks));
-        lore.add(ChatColor.translateAlternateColorCodes('&', plugin.getMessageManager().getItemMessage("lore.total_blocks", totalBlocksReplacements)));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.total_blocks", totalBlocksReplacements));
         
         meta.setLore(lore);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -127,7 +125,7 @@ public class ItemUtils {
         if (!isMultitool(item)) return 0;
         String name = item.getItemMeta().getDisplayName();
         try {
-            return Integer.parseInt(name.split("Poziom ")[1].replace("§", "").replace("]", ""));
+            return Integer.parseInt(name.split("Poziom ")[1].replace("]", ""));
         } catch (Exception e) {
             return 0;
         }

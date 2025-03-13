@@ -5,13 +5,16 @@ import org.VodkaJpg.multitool.listeners.MultitoolListener;
 import org.VodkaJpg.multitool.managers.MessageManager;
 import org.VodkaJpg.multitool.utils.ItemUtils;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Random;
 
 public class Multitool extends JavaPlugin {
     private static Multitool instance;
     private FileConfiguration config;
+    private FileConfiguration messagesConfig;
     private Random random;
     private CommandManager commandManager;
     private MessageManager messageManager;
@@ -21,15 +24,17 @@ public class Multitool extends JavaPlugin {
     public void onEnable() {
         instance = this;
         
-        // Zapisz domyślną konfigurację
+        // Zapisz domyślne pliki konfiguracyjne
         saveDefaultConfig();
+        saveResource("messages.yml", false);
         
-        // Załaduj konfigurację
+        // Załaduj konfiguracje
         config = getConfig();
+        messagesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
         
         // Inicjalizacja menedżerów
         random = new Random();
-        messageManager = new MessageManager(this);
+        messageManager = new MessageManager(messagesConfig);
         itemUtils = new ItemUtils(this);
         
         // Inicjalizacja CommandManager
@@ -43,16 +48,24 @@ public class Multitool extends JavaPlugin {
         getCommand("multitool").setTabCompleter(commandManager);
         
         // Log włączenia pluginu
-        getLogger().info(messageManager.getPrefix() + messageManager.getMessage("plugin.enabled"));
+        getLogger().info(messageManager.getPrefix() + " " + messageManager.getMessage("messages.plugin.enabled"));
     }
 
     @Override
     public void onDisable() {
         if (messageManager != null) {
-            getLogger().info(messageManager.getPrefix() + messageManager.getMessage("plugin.disabled"));
+            getLogger().info(messageManager.getPrefix() + " " + messageManager.getMessage("messages.plugin.disabled"));
         } else {
             getLogger().info("Plugin został wyłączony!");
         }
+    }
+
+    public void reloadConfigs() {
+        reloadConfig();
+        config = getConfig();
+        File messagesFile = new File(getDataFolder(), "messages.yml");
+        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        messageManager = new MessageManager(messagesConfig);
     }
 
     public boolean hasChance(double chance) {
@@ -73,10 +86,6 @@ public class Multitool extends JavaPlugin {
 
     public static Multitool getInstance() {
         return instance;
-    }
-
-    public FileConfiguration getPluginConfig() {
-        return config;
     }
 
     public Random getRandom() {
