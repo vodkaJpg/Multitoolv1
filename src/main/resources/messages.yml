@@ -36,15 +36,15 @@ messages:
   
   # Informacje o przedmiocie
   item:
-    name: "&dMultiTool &7[Poziom {level}]"
+    name: "&6MultiTool &7[Poziom {level}]"
     lore:
-      enchantments_title: "&aEnchantments:"
-      enchantment: "&a{enchantment}"
-      bonuses_title: "&aBonusy:"
+      enchantments_title: "&eEnchantments:"
+      enchantment: "&7- {enchantment}"
+      bonuses_title: "&6Bonusy:"
       bonus: "&7- {bonus}"
-      level: "&7Poziom: &f{level}"
-      blocks_mined: "&7Wykopane bloki: &f{blocks}/{required_blocks}"
-      total_blocks: "&7Łączna ilość wykopanych bloków: &f{total_blocks}"
+      level: "&7Poziom: &e{level}"
+      blocks_mined: "&7Wykopane bloki: &e{blocks}&7/&e{required_blocks}"
+      total_blocks: "&7Łączna ilość wykopanych bloków: &e{total_blocks}"
       upgrade_info: "&dWykop {blocks} bloków aby ulepszyć!"
 
   # Plugin
