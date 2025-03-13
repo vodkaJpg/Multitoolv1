@@ -24,6 +24,7 @@ public class ItemUtils {
     public ItemStack createMultitool(int toolLevel, long blocksMined) {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
         
         // Ustaw nazwę przedmiotu
         Map<String, String> nameReplacements = new HashMap<>();
@@ -52,22 +53,26 @@ public class ItemUtils {
             for (String enchant : enchantments) {
                 String[] parts = enchant.split(":");
                 if (parts.length == 2) {
-                    String enchantName = parts[0].toUpperCase();
+                    String enchantName = parts[0].toLowerCase();
                     try {
-                        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName.toLowerCase()));
+                        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
                         if (enchantment != null) {
                             int enchantLevel = Integer.parseInt(parts[1]);
-                            meta.addEnchant(enchantment, enchantLevel, true);
-                            
-                            Map<String, String> enchantReplacements = new HashMap<>();
-                            // Formatuj nazwę enchantu (np. z "efficiency" na "Efficiency")
-                            String formattedName = enchantName.substring(0, 1).toUpperCase() + 
-                                                 enchantName.substring(1).toLowerCase();
-                            enchantReplacements.put("enchantment", formattedName + " " + enchantLevel);
-                            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+                            if (meta.addEnchant(enchantment, enchantLevel, true)) {
+                                Map<String, String> enchantReplacements = new HashMap<>();
+                                // Formatuj nazwę enchantu (np. z "efficiency" na "Efficiency")
+                                String formattedName = enchantName.substring(0, 1).toUpperCase() + 
+                                                     enchantName.substring(1).toLowerCase();
+                                enchantReplacements.put("enchantment", formattedName + " " + enchantLevel);
+                                lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+                            } else {
+                                plugin.getLogger().warning("Nie udało się dodać enchantu: " + enchantName + " poziom " + enchantLevel);
+                            }
+                        } else {
+                            plugin.getLogger().warning("Nie znaleziono enchantu: " + enchantName);
                         }
                     } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Nieprawidłowy enchant: " + enchantName);
+                        plugin.getLogger().warning("Nieprawidłowy enchant lub poziom: " + enchant + " (" + e.getMessage() + ")");
                     }
                 }
             }
@@ -104,7 +109,6 @@ public class ItemUtils {
         lore.add(plugin.getMessageManager().getItemMessage("lore.total_blocks", totalBlocksReplacements));
         
         meta.setLore(lore);
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         
         return item;
