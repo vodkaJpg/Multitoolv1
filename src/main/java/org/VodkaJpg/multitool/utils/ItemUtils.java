@@ -55,41 +55,46 @@ public class ItemUtils {
         
         List<String> lore = new ArrayList<>();
         
-        // Logowanie debugowania dla enchantu
-        plugin.getLogger().info("Tworzenie Multitool na poziomie " + toolLevel);
+        // Dodaj enchanty bezpośrednio (bez używania namespacedkeys)
+        plugin.getLogger().info("Dodaję enchanty bezpośrednio dla poziomu " + toolLevel);
         
-        // Dodaj sekcję enchantów
-        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
-        List<String> enchantments = levelConfig.getStringList("enchantments");
-        plugin.getLogger().info("Znalezione enchanty: " + enchantments.toString());
-        
-        for (String enchant : enchantments) {
-            String[] parts = enchant.split(":");
-            if (parts.length == 3 && parts[0].equals("minecraft")) {
-                String enchantName = parts[1];
-                try {
-                    int enchantLevel = Integer.parseInt(parts[2]);
-                    plugin.getLogger().info("Próba dodania enchantu: " + enchantName + " poziom " + enchantLevel);
-                    
-                    Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
-                    if (enchantment != null) {
-                        // Dodaj enchant do przedmiotu
-                        boolean added = meta.addEnchant(enchantment, enchantLevel, true);
-                        
-                        // Dodaj informacje o enchancie do lore
-                        Map<String, String> enchantReplacements = new HashMap<>();
-                        String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
-                        enchantReplacements.put("enchantment", displayName + " " + toRomanNumeral(enchantLevel));
-                        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
-                        plugin.getLogger().info("Dodano enchant: " + enchantName + " poziom " + enchantLevel + " (sukces: " + added + ")");
-                    } else {
-                        plugin.getLogger().warning("Nie znaleziono enchantu: " + enchantName);
-                    }
-                } catch (IllegalArgumentException e) {
-                    plugin.getLogger().warning("Nieprawidłowy poziom enchantu: " + enchant);
-                }
-            }
+        // Efektywność
+        int efficiencyLevel = levelConfig.getInt("efficiency", 0);
+        if (efficiencyLevel > 0) {
+            meta.addEnchant(Enchantment.EFFICIENCY, efficiencyLevel, true);
+            plugin.getLogger().info("Dodano Efficiency " + efficiencyLevel);
         }
+        
+        // Fortuna
+        int fortuneLevel = levelConfig.getInt("fortune", 0);
+        if (fortuneLevel > 0) {
+            meta.addEnchant(Enchantment.FORTUNE, fortuneLevel, true);
+            plugin.getLogger().info("Dodano Fortune " + fortuneLevel);
+        }
+        
+        // Niezniszczalność
+        meta.addEnchant(Enchantment.UNBREAKING, toolLevel, true);
+        plugin.getLogger().info("Dodano Unbreaking " + toolLevel);
+        
+        // Dodaj sekcję enchantów w lore
+        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
+        
+        // Wyświetl enchanty w lore
+        if (efficiencyLevel > 0) {
+            Map<String, String> enchantReplacements = new HashMap<>();
+            enchantReplacements.put("enchantment", "Efficiency " + toRomanNumeral(efficiencyLevel));
+            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+        }
+        
+        if (fortuneLevel > 0) {
+            Map<String, String> enchantReplacements = new HashMap<>();
+            enchantReplacements.put("enchantment", "Fortune " + toRomanNumeral(fortuneLevel));
+            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+        }
+        
+        Map<String, String> enchantReplacements = new HashMap<>();
+        enchantReplacements.put("enchantment", "Unbreaking " + toRomanNumeral(toolLevel));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
         
         // Dodaj sekcję bonusów
         List<String> bonuses = levelConfig.getStringList("bonuses");

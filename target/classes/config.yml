@@ -5,38 +5,22 @@ levels:
   1:
     efficiency: 1
     fortune: 1
-    enchantments:
-      - "minecraft:efficiency:1"
-      - "minecraft:fortune:1"
-      - "minecraft:unbreaking:1"
     bonuses: []
     required_blocks: 10000
   2:
     efficiency: 2
     fortune: 2
-    enchantments:
-      - "minecraft:efficiency:2"
-      - "minecraft:fortune:2"
-      - "minecraft:unbreaking:2"
     bonuses: []
     required_blocks: 30000
   3:
     efficiency: 3
     fortune: 3
-    enchantments:
-      - "minecraft:efficiency:3"
-      - "minecraft:fortune:3"
-      - "minecraft:unbreaking:3"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
     required_blocks: 50000
   4:
     efficiency: 4
     fortune: 4
-    enchantments:
-      - "minecraft:efficiency:4"
-      - "minecraft:fortune:4"
-      - "minecraft:unbreaking:4"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
@@ -44,10 +28,6 @@ levels:
   5:
     efficiency: 5
     fortune: 5
-    enchantments:
-      - "minecraft:efficiency:5"
-      - "minecraft:fortune:5"
-      - "minecraft:unbreaking:5"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
@@ -56,10 +36,6 @@ levels:
   6:
     efficiency: 6
     fortune: 6
-    enchantments:
-      - "minecraft:efficiency:6"
-      - "minecraft:fortune:6"
-      - "minecraft:unbreaking:6"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
@@ -69,10 +45,6 @@ levels:
   7:
     efficiency: 7
     fortune: 7
-    enchantments:
-      - "minecraft:efficiency:7"
-      - "minecraft:fortune:7"
-      - "minecraft:unbreaking:7"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"

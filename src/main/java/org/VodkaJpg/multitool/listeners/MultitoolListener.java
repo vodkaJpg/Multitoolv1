@@ -39,19 +39,22 @@ public class MultitoolListener implements Listener {
             blocksMined++;
             
             // Sprawdź, czy narzędzie powinno zostać ulepszone
-            long requiredBlocks = plugin.getConfig().getLong("levels." + currentLevel + ".required_blocks", 0);
-            if (blocksMined >= requiredBlocks && currentLevel < 7) {
-                // Utwórz nowe narzędzie o wyższym poziomie
-                ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1, 0);
-                player.getInventory().setItemInMainHand(newTool);
-                
-                // Wyślij wiadomość o ulepszeniu
-                Map<String, String> replacements = new HashMap<>();
-                replacements.put("level", String.valueOf(currentLevel + 1));
-                player.sendMessage(plugin.getMessageManager().getMessage("success.level_up", replacements));
-            } else {
-                // Zaktualizuj statystyki narzędzia
-                plugin.getItemUtils().updateBlocksMined(item, blocksMined);
+            ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + currentLevel);
+            if (levelConfig != null) {
+                long requiredBlocks = levelConfig.getLong("required_blocks", 0);
+                if (blocksMined >= requiredBlocks && currentLevel < 7) {
+                    // Utwórz nowe narzędzie o wyższym poziomie
+                    ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1, 0);
+                    player.getInventory().setItemInMainHand(newTool);
+                    
+                    // Wyślij wiadomość o ulepszeniu
+                    Map<String, String> replacements = new HashMap<>();
+                    replacements.put("level", String.valueOf(currentLevel + 1));
+                    player.sendMessage(plugin.getMessageManager().getMessage("success.level_up", replacements));
+                } else {
+                    // Zaktualizuj statystyki narzędzia
+                    plugin.getItemUtils().updateBlocksMined(item, blocksMined);
+                }
             }
             
             // Zastosuj bonusy w zależności od poziomu
