@@ -2,6 +2,7 @@ package org.VodkaJpg.multitool.utils;
 
 import org.VodkaJpg.multitool.Multitool;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -20,17 +21,17 @@ public class ItemUtils {
         this.plugin = plugin;
     }
 
-    public ItemStack createMultitool(int level, long blocksMined) {
+    public ItemStack createMultitool(int toolLevel, long blocksMined) {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
         ItemMeta meta = item.getItemMeta();
         
         // Ustaw nazwę przedmiotu
         Map<String, String> nameReplacements = new HashMap<>();
-        nameReplacements.put("level", String.valueOf(level));
+        nameReplacements.put("level", String.valueOf(toolLevel));
         meta.setDisplayName(plugin.getMessageManager().getItemMessage("name", nameReplacements));
         
         // Pobierz konfigurację dla danego poziomu
-        ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + level);
+        ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + toolLevel);
         if (levelConfig == null) return item;
         
         // Pobierz enchanty
@@ -46,18 +47,28 @@ public class ItemUtils {
         List<String> lore = new ArrayList<>();
         
         // Dodaj sekcję enchantów
-        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
-        for (String enchant : enchantments) {
-            String[] parts = enchant.split(":");
-            if (parts.length == 2) {
-                Enchantment enchantment = Enchantment.getByName(parts[0]);
-                if (enchantment != null) {
-                    meta.addEnchant(enchantment, Integer.parseInt(parts[1]), true);
-                    Map<String, String> enchantReplacements = new HashMap<>();
-                    String enchantName = enchantment.getKey().getKey().toLowerCase();
-                    enchantName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1);
-                    enchantReplacements.put("enchantment", enchantName + " " + parts[1]);
-                    lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+        if (!enchantments.isEmpty()) {
+            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
+            for (String enchant : enchantments) {
+                String[] parts = enchant.split(":");
+                if (parts.length == 2) {
+                    String enchantName = parts[0].toUpperCase();
+                    try {
+                        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName.toLowerCase()));
+                        if (enchantment != null) {
+                            int enchantLevel = Integer.parseInt(parts[1]);
+                            meta.addEnchant(enchantment, enchantLevel, true);
+                            
+                            Map<String, String> enchantReplacements = new HashMap<>();
+                            // Formatuj nazwę enchantu (np. z "efficiency" na "Efficiency")
+                            String formattedName = enchantName.substring(0, 1).toUpperCase() + 
+                                                 enchantName.substring(1).toLowerCase();
+                            enchantReplacements.put("enchantment", formattedName + " " + enchantLevel);
+                            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().warning("Nieprawidłowy enchant: " + enchantName);
+                    }
                 }
             }
         }
@@ -76,7 +87,7 @@ public class ItemUtils {
         // Dodaj poziom
         lore.add("");
         Map<String, String> levelReplacements = new HashMap<>();
-        levelReplacements.put("level", String.valueOf(level));
+        levelReplacements.put("level", String.valueOf(toolLevel));
         lore.add(plugin.getMessageManager().getItemMessage("lore.level", levelReplacements));
         
         // Dodaj informacje o blokach
@@ -88,7 +99,7 @@ public class ItemUtils {
         // Dodaj informację o łącznej ilości bloków
         lore.add("");
         Map<String, String> totalBlocksReplacements = new HashMap<>();
-        long totalBlocks = calculateTotalBlocks(level - 1) + blocksMined;
+        long totalBlocks = calculateTotalBlocks(toolLevel - 1) + blocksMined;
         totalBlocksReplacements.put("total_blocks", formatNumber(totalBlocks));
         lore.add(plugin.getMessageManager().getItemMessage("lore.total_blocks", totalBlocksReplacements));
         

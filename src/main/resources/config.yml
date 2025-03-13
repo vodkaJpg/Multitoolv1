@@ -6,27 +6,27 @@ levels:
     efficiency: 1
     fortune: 1
     enchantments:
-      - "DURABILITY:1"
-      - "DIG_SPEED:1"
-      - "LOOT_BONUS_BLOCKS:1"
+      - "unbreaking:1"
+      - "efficiency:1"
+      - "fortune:1"
     bonuses: []
     required_blocks: 10000
   2:
     efficiency: 2
     fortune: 2
     enchantments:
-      - "DURABILITY:2"
-      - "DIG_SPEED:2"
-      - "LOOT_BONUS_BLOCKS:2"
+      - "unbreaking:2"
+      - "efficiency:2"
+      - "fortune:2"
     bonuses: []
     required_blocks: 30000
   3:
     efficiency: 3
     fortune: 3
     enchantments:
-      - "DURABILITY:3"
-      - "DIG_SPEED:3"
-      - "LOOT_BONUS_BLOCKS:3"
+      - "unbreaking:3"
+      - "efficiency:3"
+      - "fortune:3"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
     required_blocks: 50000
@@ -34,9 +34,9 @@ levels:
     efficiency: 4
     fortune: 4
     enchantments:
-      - "DURABILITY:4"
-      - "DIG_SPEED:4"
-      - "LOOT_BONUS_BLOCKS:4"
+      - "unbreaking:4"
+      - "efficiency:4"
+      - "fortune:4"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
@@ -45,9 +45,9 @@ levels:
     efficiency: 5
     fortune: 5
     enchantments:
-      - "DURABILITY:5"
-      - "DIG_SPEED:5"
-      - "LOOT_BONUS_BLOCKS:5"
+      - "unbreaking:5"
+      - "efficiency:5"
+      - "fortune:5"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
@@ -57,9 +57,9 @@ levels:
     efficiency: 6
     fortune: 6
     enchantments:
-      - "DURABILITY:6"
-      - "DIG_SPEED:6"
-      - "LOOT_BONUS_BLOCKS:6"
+      - "unbreaking:6"
+      - "efficiency:6"
+      - "fortune:6"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
@@ -70,9 +70,9 @@ levels:
     efficiency: 7
     fortune: 7
     enchantments:
-      - "DURABILITY:7"
-      - "DIG_SPEED:7"
-      - "LOOT_BONUS_BLOCKS:7"
+      - "unbreaking:7"
+      - "efficiency:7"
+      - "fortune:7"
     bonuses:
       - "0.1% szansy na otrzymanie bloku żelaza"
       - "0.1% szansy na otrzymanie bloku złota"
