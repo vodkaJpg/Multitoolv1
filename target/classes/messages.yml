@@ -43,8 +43,8 @@ messages:
       blocks_mined: "&7Wykopane bloki: &e{blocks}&7/&e{required_blocks}"
       total_blocks: "&7Łączna ilość wykopanych bloków: &e{total_blocks}"
       upgrade_info: "&dWykop {blocks} bloków aby ulepszyć!"
-
+  
   # Plugin
   plugin:
-    enabled: "&aPlugin został włączony!"
-    disabled: "&cPlugin został wyłączony!" 
+    enabled: "Plugin został włączony!"
+    disabled: "Plugin został wyłączony!" 

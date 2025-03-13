@@ -18,16 +18,21 @@ public class MessageManager {
     }
 
     public String getMessage(String path) {
-        String message = messages.getString(path, "Nie znaleziono wiadomości: " + path);
+        String message = messages.getString(path);
+        if (message == null) {
+            return "§cNie znaleziono wiadomości: " + path;
+        }
         return colorize(message);
     }
 
     public String getMessage(String path, Map<String, String> replacements) {
         String message = getMessage(path);
-        for (Map.Entry<String, String> replacement : replacements.entrySet()) {
-            message = message.replace("{" + replacement.getKey() + "}", replacement.getValue());
+        if (replacements != null) {
+            for (Map.Entry<String, String> replacement : replacements.entrySet()) {
+                message = message.replace("{" + replacement.getKey() + "}", replacement.getValue());
+            }
         }
-        return colorize(message);
+        return message;
     }
 
     public String getSuccess(String path) {

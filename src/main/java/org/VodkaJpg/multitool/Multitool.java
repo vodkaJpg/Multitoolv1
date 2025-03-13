@@ -9,6 +9,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Random;
 
 public class Multitool extends JavaPlugin {
@@ -29,8 +32,7 @@ public class Multitool extends JavaPlugin {
         saveResource("messages.yml", false);
         
         // Załaduj konfiguracje
-        config = getConfig();
-        messagesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
+        reloadConfigs();
         
         // Inicjalizacja menedżerów
         random = new Random();
@@ -61,11 +63,28 @@ public class Multitool extends JavaPlugin {
     }
 
     public void reloadConfigs() {
+        // Przeładuj config.yml
         reloadConfig();
         config = getConfig();
+        
+        // Przeładuj messages.yml
         File messagesFile = new File(getDataFolder(), "messages.yml");
+        if (!messagesFile.exists()) {
+            saveResource("messages.yml", false);
+        }
         messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
-        messageManager = new MessageManager(messagesConfig);
+        
+        // Załaduj domyślne wiadomości z zasobów jako fallback
+        InputStream defaultMessagesStream = getResource("messages.yml");
+        if (defaultMessagesStream != null) {
+            YamlConfiguration defaultMessages = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
+            messagesConfig.setDefaults(defaultMessages);
+        }
+        
+        // Jeśli MessageManager już istnieje, zaktualizuj go
+        if (messageManager != null) {
+            messageManager = new MessageManager(messagesConfig);
+        }
     }
 
     public boolean hasChance(double chance) {
