@@ -34,7 +34,7 @@ public class MessageManager {
     }
 
     public String getMessage(String path, Map<String, String> replacements) {
-        String message = messages.getString("messages." + path);
+        String message = messages.getString(path);
         if (message == null) {
             return "Message not found: " + path;
         }
@@ -57,27 +57,27 @@ public class MessageManager {
     }
 
     public String getCommandMessage(String path) {
-        return getMessage("commands." + path);
+        return getMessage("messages.commands." + path);
     }
 
     public String getError(String path) {
-        return getMessage("errors." + path);
+        return getMessage("messages.errors." + path);
     }
 
     public String getSuccess(String path) {
-        return getMessage("success." + path);
+        return getMessage("messages.success." + path);
     }
 
     public String getSuccess(String path, Map<String, String> replacements) {
-        return getMessage("success." + path, replacements);
+        return getMessage("messages.success." + path, replacements);
     }
 
     public String getItemMessage(String path) {
-        return getMessage("item." + path);
+        return getMessage("messages.item." + path);
     }
 
     public String getItemMessage(String path, Map<String, String> replacements) {
-        return getMessage("item." + path, replacements);
+        return getMessage("messages.item." + path, replacements);
     }
 
     private String colorize(String message) {

@@ -54,7 +54,9 @@ public class ItemUtils {
                 if (enchantment != null) {
                     meta.addEnchant(enchantment, Integer.parseInt(parts[1]), true);
                     Map<String, String> enchantReplacements = new HashMap<>();
-                    enchantReplacements.put("enchantment", enchantment.getKey().getKey() + " " + parts[1]);
+                    String enchantName = enchantment.getKey().getKey().toLowerCase();
+                    enchantName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1);
+                    enchantReplacements.put("enchantment", enchantName + " " + parts[1]);
                     lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
                 }
             }
