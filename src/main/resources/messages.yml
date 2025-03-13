@@ -23,6 +23,7 @@ messages:
     give: "&aOtrzymałeś Multitool poziomu {level}!"
     prestige: "&aTwój Multitool został ulepszony do poziomu prestiżowego!"
     reload: "&aKonfiguracja pluginu została przeładowana!"
+    level_up: "&aGratulacje! Twój Multitool awansował na poziom {level}!"
   
   # Informacje o przedmiocie
   item:

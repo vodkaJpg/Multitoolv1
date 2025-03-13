@@ -1,0 +1,101 @@
+# Konfiguracja Multitool
+# Poziomy i ich ulepszenia
+
+levels:
+  1:
+    efficiency: 1
+    fortune: 1
+    enchantments:
+      - "DURABILITY:1"
+      - "DIG_SPEED:1"
+      - "LOOT_BONUS_BLOCKS:1"
+    bonuses: []
+    required_blocks: 10000
+  2:
+    efficiency: 2
+    fortune: 2
+    enchantments:
+      - "DURABILITY:2"
+      - "DIG_SPEED:2"
+      - "LOOT_BONUS_BLOCKS:2"
+    bonuses: []
+    required_blocks: 30000
+  3:
+    efficiency: 3
+    fortune: 3
+    enchantments:
+      - "DURABILITY:3"
+      - "DIG_SPEED:3"
+      - "LOOT_BONUS_BLOCKS:3"
+    bonuses:
+      - "0.1% szansy na otrzymanie bloku żelaza"
+    required_blocks: 50000
+  4:
+    efficiency: 4
+    fortune: 4
+    enchantments:
+      - "DURABILITY:4"
+      - "DIG_SPEED:4"
+      - "LOOT_BONUS_BLOCKS:4"
+    bonuses:
+      - "0.1% szansy na otrzymanie bloku żelaza"
+      - "0.1% szansy na otrzymanie bloku złota"
+    required_blocks: 100000
+  5:
+    efficiency: 5
+    fortune: 5
+    enchantments:
+      - "DURABILITY:5"
+      - "DIG_SPEED:5"
+      - "LOOT_BONUS_BLOCKS:5"
+    bonuses:
+      - "0.1% szansy na otrzymanie bloku żelaza"
+      - "0.1% szansy na otrzymanie bloku złota"
+      - "Auto-wytapianie rud żelaza i złota"
+    required_blocks: 200000
+  6:
+    efficiency: 6
+    fortune: 6
+    enchantments:
+      - "DURABILITY:6"
+      - "DIG_SPEED:6"
+      - "LOOT_BONUS_BLOCKS:6"
+    bonuses:
+      - "0.1% szansy na otrzymanie bloku żelaza"
+      - "0.1% szansy na otrzymanie bloku złota"
+      - "Auto-wytapianie rud żelaza i złota"
+      - "0.1% szansy na otrzymanie bloku diamentu"
+    required_blocks: 500000
+  7:
+    efficiency: 7
+    fortune: 7
+    enchantments:
+      - "DURABILITY:7"
+      - "DIG_SPEED:7"
+      - "LOOT_BONUS_BLOCKS:7"
+    bonuses:
+      - "0.1% szansy na otrzymanie bloku żelaza"
+      - "0.1% szansy na otrzymanie bloku złota"
+      - "Auto-wytapianie rud żelaza i złota"
+      - "0.1% szansy na otrzymanie bloku diamentu"
+      - "0.1% szansy na otrzymanie bloku emeraldu"
+    required_blocks: 1000000
+
+# Ustawienia prestiżu
+prestige:
+  enabled: true
+  max_level: 10
+  bonus_multiplier: 1.5
+  enchantment_multiplier: 1.2
+  required_blocks: 2000000
+
+# Ustawienia wydajności
+settings:
+  auto_smelt:
+    iron_ore: true
+    gold_ore: true
+  drop_chances:
+    iron_block: 0.001
+    gold_block: 0.001
+    diamond_block: 0.001
+    emerald_block: 0.001 

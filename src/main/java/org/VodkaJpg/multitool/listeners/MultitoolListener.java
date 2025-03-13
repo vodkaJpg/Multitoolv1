@@ -1,15 +1,22 @@
 package org.VodkaJpg.multitool.listeners;
 
 import org.VodkaJpg.multitool.Multitool;
+import org.VodkaJpg.multitool.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultitoolListener implements Listener {
     private final Multitool plugin;
+    private final Map<String, Long> blocksMined = new HashMap<>();
 
     public MultitoolListener(Multitool plugin) {
         this.plugin = plugin;
@@ -20,107 +27,99 @@ public class MultitoolListener implements Listener {
         ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
         if (!plugin.getItemUtils().isMultitool(tool)) return;
 
-        Block block = event.getBlock();
-        int level = plugin.getItemUtils().getMultitoolLevel(tool);
+        // Zmień typ narzędzia w zależności od bloku
+        changeToolType(tool, event.getBlock());
 
-        // Zmiana typu narzędzia w zależności od bloku
-        Material newToolType = getAppropriateToolType(block.getType());
-        if (newToolType != null && newToolType != tool.getType()) {
-            ItemStack newTool = tool.clone();
-            newTool.setType(newToolType);
-            event.getPlayer().getInventory().setItemInMainHand(newTool);
+        // Zwiększ licznik wykopanych bloków
+        String playerName = event.getPlayer().getName();
+        blocksMined.put(playerName, blocksMined.getOrDefault(playerName, 0L) + 1);
+
+        // Sprawdź czy gracz może awansować na następny poziom
+        checkLevelUp(event.getPlayer(), tool);
+
+        // Zastosuj bonusy w zależności od poziomu
+        applyBonuses(event);
+    }
+
+    private void checkLevelUp(org.bukkit.entity.Player player, ItemStack tool) {
+        int currentLevel = plugin.getItemUtils().getMultitoolLevel(tool);
+        if (currentLevel >= 7) return; // Maksymalny poziom
+
+        String playerName = player.getName();
+        long blocks = blocksMined.getOrDefault(playerName, 0L);
+        
+        // Pobierz wymagane bloki dla następnego poziomu
+        ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + currentLevel);
+        if (levelConfig == null) return;
+        
+        long requiredBlocks = levelConfig.getLong("required_blocks", 0);
+        
+        // Sprawdź czy gracz może awansować
+        if (blocks >= requiredBlocks) {
+            // Zresetuj licznik bloków
+            blocksMined.put(playerName, 0L);
+            
+            // Zwiększ poziom
+            ItemStack newTool = plugin.getItemUtils().createMultitool(currentLevel + 1);
+            player.getInventory().setItemInMainHand(newTool);
+            
+            // Wyślij wiadomość o awansie
+            Map<String, String> replacements = new HashMap<>();
+            replacements.put("level", String.valueOf(currentLevel + 1));
+            player.sendMessage(plugin.getMessageManager().getSuccess("level_up", replacements));
         }
+    }
 
-        // Sprawdź bonusy
-        if (level >= 3 && block.getType() == Material.IRON_ORE) {
-            if (plugin.hasChance(plugin.getMultitoolConfig().getDouble("settings.iron-block-chance"))) {
-                event.getPlayer().getInventory().addItem(new ItemStack(Material.IRON_BLOCK));
-            }
-        }
-
-        if (level >= 7 && block.getType() == Material.GOLD_ORE) {
-            if (plugin.hasChance(plugin.getMultitoolConfig().getDouble("settings.gold-block-chance"))) {
-                event.getPlayer().getInventory().addItem(new ItemStack(Material.GOLD_BLOCK));
-            }
-        }
-
-        // Auto-smelting dla poziomu 5
-        if (level >= 5) {
-            if (block.getType() == Material.IRON_ORE) {
-                event.setExpToDrop(0);
-                event.getPlayer().getInventory().addItem(new ItemStack(Material.IRON_INGOT));
-            } else if (block.getType() == Material.GOLD_ORE) {
-                event.setExpToDrop(0);
-                event.getPlayer().getInventory().addItem(new ItemStack(Material.GOLD_INGOT));
-            }
+    private void changeToolType(ItemStack tool, Block block) {
+        Material newType = getAppropriateToolType(block.getType());
+        if (newType != tool.getType()) {
+            tool.setType(newType);
         }
     }
 
     private Material getAppropriateToolType(Material blockType) {
-        // Dla bloków wymagających kilofa
-        if (blockType.name().contains("ORE") || 
-            blockType == Material.STONE || 
-            blockType == Material.COBBLESTONE ||
-            blockType == Material.DEEPSLATE ||
-            blockType == Material.TUFF ||
-            blockType == Material.CALCITE ||
-            blockType == Material.AMETHYST_BLOCK ||
-            blockType == Material.BUDDING_AMETHYST ||
-            blockType == Material.AMETHYST_CLUSTER ||
-            blockType == Material.LARGE_AMETHYST_BUD ||
-            blockType == Material.MEDIUM_AMETHYST_BUD ||
-            blockType == Material.SMALL_AMETHYST_BUD) {
+        if (blockType.name().contains("_ORE") || blockType.name().contains("_STONE")) {
             return Material.DIAMOND_PICKAXE;
-        }
-        
-        // Dla bloków wymagających łopaty
-        if (blockType.name().contains("DIRT") || 
-            blockType == Material.SAND ||
-            blockType == Material.GRAVEL ||
-            blockType == Material.SOUL_SAND ||
-            blockType == Material.SOUL_SOIL ||
-            blockType == Material.CLAY ||
-            blockType == Material.SNOW ||
-            blockType == Material.SNOW_BLOCK ||
-            blockType == Material.POWDER_SNOW ||
-            blockType == Material.MUD ||
-            blockType == Material.PACKED_MUD) {
+        } else if (blockType.name().contains("_DIRT") || blockType.name().contains("_SAND")) {
             return Material.DIAMOND_SHOVEL;
-        }
-        
-        // Dla bloków wymagających siekiery
-        if (blockType.name().contains("LOG") || 
-            blockType.name().contains("WOOD") ||
-            blockType == Material.BAMBOO ||
-            blockType == Material.CHERRY_LOG ||
-            blockType == Material.CHERRY_WOOD ||
-            blockType == Material.MANGROVE_LOG ||
-            blockType == Material.MANGROVE_WOOD ||
-            blockType == Material.MANGROVE_ROOTS) {
+        } else if (blockType.name().contains("_LOG") || blockType.name().contains("_LEAVES")) {
             return Material.DIAMOND_AXE;
-        }
-        
-        // Dla bloków wymagających motyki
-        if (blockType.name().contains("LEAVES") ||
-            blockType == Material.WHEAT ||
-            blockType == Material.CARROTS ||
-            blockType == Material.POTATOES ||
-            blockType == Material.BEETROOTS ||
-            blockType == Material.MELON ||
-            blockType == Material.PUMPKIN ||
-            blockType == Material.NETHER_WART ||
-            blockType == Material.SWEET_BERRY_BUSH ||
-            blockType == Material.CAVE_VINES ||
-            blockType == Material.WEEPING_VINES ||
-            blockType == Material.TWISTING_VINES ||
-            blockType == Material.KELP ||
-            blockType == Material.SEAGRASS ||
-            blockType == Material.MOSS_BLOCK ||
-            blockType == Material.AZALEA ||
-            blockType == Material.FLOWERING_AZALEA) {
+        } else if (blockType.name().contains("_GRASS") || blockType.name().contains("_PLANT")) {
             return Material.DIAMOND_HOE;
         }
+        return Material.DIAMOND_PICKAXE;
+    }
+
+    private void applyBonuses(BlockBreakEvent event) {
+        ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
+        int level = plugin.getItemUtils().getMultitoolLevel(tool);
+        Block block = event.getBlock();
         
-        return null;
+        // Pobierz konfigurację dla danego poziomu
+        ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + level);
+        if (levelConfig == null) return;
+
+        // Sprawdź bonusy dla danego poziomu
+        if (level >= 3 && block.getType() == Material.IRON_ORE && plugin.hasChance(0.001)) {
+            event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.IRON_BLOCK));
+        }
+        if (level >= 4 && block.getType() == Material.GOLD_ORE && plugin.hasChance(0.001)) {
+            event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.GOLD_BLOCK));
+        }
+        if (level >= 5) {
+            if (block.getType() == Material.IRON_ORE) {
+                event.setExpToDrop(0);
+                event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.IRON_INGOT));
+            } else if (block.getType() == Material.GOLD_ORE) {
+                event.setExpToDrop(0);
+                event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.GOLD_INGOT));
+            }
+        }
+        if (level >= 6 && block.getType() == Material.DIAMOND_ORE && plugin.hasChance(0.001)) {
+            event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.DIAMOND_BLOCK));
+        }
+        if (level >= 7 && block.getType() == Material.EMERALD_ORE && plugin.hasChance(0.001)) {
+            event.getBlock().getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.EMERALD_BLOCK));
+        }
     }
 } 

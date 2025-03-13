@@ -68,6 +68,10 @@ public class MessageManager {
         return getMessage("success." + path);
     }
 
+    public String getSuccess(String path, Map<String, String> replacements) {
+        return getMessage("success." + path, replacements);
+    }
+
     public String getItemMessage(String path) {
         return getMessage("item." + path);
     }
