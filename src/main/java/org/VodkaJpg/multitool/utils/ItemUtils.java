@@ -73,20 +73,42 @@ public class ItemUtils {
             }
         }
         
-        // Dodaj informacje o blokach
+        // Dodaj poziom
         lore.add("");
-        Map<String, String> blocksReplacements = new HashMap<>();
-        blocksReplacements.put("blocks", formatNumber(requiredBlocks));
-        lore.add(plugin.getMessageManager().getItemMessage("lore.blocks_needed", blocksReplacements));
+        Map<String, String> levelReplacements = new HashMap<>();
+        levelReplacements.put("level", String.valueOf(level));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.level", levelReplacements));
         
+        // Dodaj informacje o blokach
+        Map<String, String> blocksReplacements = new HashMap<>();
         blocksReplacements.put("blocks", formatNumber(blocksMined));
+        blocksReplacements.put("required_blocks", formatNumber(requiredBlocks));
         lore.add(plugin.getMessageManager().getItemMessage("lore.blocks_mined", blocksReplacements));
+        
+        // Dodaj informację o łącznej ilości bloków
+        lore.add("");
+        Map<String, String> totalBlocksReplacements = new HashMap<>();
+        // Oblicz łączną ilość bloków z poprzednich poziomów
+        long totalBlocks = calculateTotalBlocks(level - 1) + blocksMined;
+        totalBlocksReplacements.put("total_blocks", formatNumber(totalBlocks));
+        lore.add(plugin.getMessageManager().getItemMessage("lore.total_blocks", totalBlocksReplacements));
         
         meta.setLore(lore);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         
         return item;
+    }
+
+    private long calculateTotalBlocks(int level) {
+        long total = 0;
+        for (int i = 1; i <= level; i++) {
+            ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + i);
+            if (levelConfig != null) {
+                total += levelConfig.getLong("required_blocks", 0);
+            }
+        }
+        return total;
     }
 
     public ItemStack createMultitool(int level) {
@@ -97,14 +119,14 @@ public class ItemUtils {
         if (item == null || item.getType() != Material.DIAMOND_PICKAXE) return false;
         ItemMeta meta = item.getItemMeta();
         if (meta == null || !meta.hasDisplayName()) return false;
-        return meta.getDisplayName().contains("Multitool");
+        return meta.getDisplayName().contains("MultiTool");
     }
 
     public int getMultitoolLevel(ItemStack item) {
         if (!isMultitool(item)) return 0;
         String name = item.getItemMeta().getDisplayName();
         try {
-            return Integer.parseInt(name.split("Poziom ")[1].replace("§", ""));
+            return Integer.parseInt(name.split("Poziom ")[1].replace("§", "").replace("]", ""));
         } catch (Exception e) {
             return 0;
         }
