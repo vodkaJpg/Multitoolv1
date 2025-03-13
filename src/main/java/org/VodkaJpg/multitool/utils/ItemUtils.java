@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,24 +53,24 @@ public class ItemUtils {
             lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
             for (String enchant : enchantments) {
                 String[] parts = enchant.split(":");
-                if (parts.length == 2) {
-                    String enchantName = parts[0].toLowerCase();
+                if (parts.length == 3 && parts[0].equals("minecraft")) {
+                    String enchantName = parts[1];
                     try {
                         Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
                         if (enchantment != null) {
-                            int enchantLevel = Integer.parseInt(parts[1]);
+                            int enchantLevel = Integer.parseInt(parts[2]);
                             if (meta.addEnchant(enchantment, enchantLevel, true)) {
                                 Map<String, String> enchantReplacements = new HashMap<>();
-                                // Formatuj nazwę enchantu (np. z "efficiency" na "Efficiency")
-                                String formattedName = enchantName.substring(0, 1).toUpperCase() + 
-                                                     enchantName.substring(1).toLowerCase();
-                                enchantReplacements.put("enchantment", formattedName + " " + enchantLevel);
+                                // Formatuj nazwę enchantu dla wyświetlania
+                                String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
+                                enchantReplacements.put("enchantment", displayName + " " + toRomanNumeral(enchantLevel));
                                 lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+                                plugin.getLogger().info("Dodano enchant: " + enchantName + " poziom " + enchantLevel);
                             } else {
-                                plugin.getLogger().warning("Nie udało się dodać enchantu: " + enchantName + " poziom " + enchantLevel);
+                                plugin.getLogger().warning("Nieznany enchant: " + enchantName);
                             }
                         } else {
-                            plugin.getLogger().warning("Nie znaleziono enchantu: " + enchantName);
+                            plugin.getLogger().warning("Nieznany enchant: " + enchantName);
                         }
                     } catch (IllegalArgumentException e) {
                         plugin.getLogger().warning("Nieprawidłowy enchant lub poziom: " + enchant + " (" + e.getMessage() + ")");
@@ -126,7 +127,49 @@ public class ItemUtils {
     }
 
     public ItemStack createMultitool(int level) {
-        return createMultitool(level, 0);
+        ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.setDisplayName(plugin.getMessageManager().getItemMessage("name", Map.of("level", String.valueOf(level))));
+            List<String> lore = new ArrayList<>();
+
+            // Dodaj enchanty
+            ConfigurationSection levelSection = plugin.getMultitoolConfig().getConfigurationSection("levels." + level);
+            if (levelSection != null) {
+                List<String> enchants = levelSection.getStringList("enchantments");
+                for (String enchant : enchants) {
+                    String[] parts = enchant.split(":");
+                    if (parts.length == 3) {
+                        String enchantName = parts[1];
+                        int enchantLevel = Integer.parseInt(parts[2]);
+                        
+                        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
+                        if (enchantment != null) {
+                            meta.addEnchant(enchantment, enchantLevel, true);
+                            String displayName = enchantName.substring(0, 1).toUpperCase() + enchantName.substring(1).toLowerCase();
+                            lore.add(ChatColor.GRAY + displayName + " " + toRomanNumeral(enchantLevel));
+                        } else {
+                            plugin.getLogger().warning("Unknown enchantment: " + enchantName);
+                        }
+                    }
+                }
+            }
+
+            // Dodaj bonusy
+            List<String> bonuses = levelSection.getStringList("bonuses");
+            if (!bonuses.isEmpty()) {
+                lore.add(plugin.getMessageManager().getItemMessage("item.bonuses"));
+                for (String bonus : bonuses) {
+                    lore.add(ChatColor.GRAY + bonus);
+                }
+            }
+
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
+
+        return item;
     }
 
     public boolean isMultitool(ItemStack item) {
@@ -153,5 +196,24 @@ public class ItemUtils {
             return String.format("%.1fK", number / 1000.0);
         }
         return String.valueOf(number);
+    }
+
+    private String toRomanNumeral(int number) {
+        if (number < 1 || number > 3999) {
+            throw new IllegalArgumentException("Number out of range (1-3999)");
+        }
+
+        StringBuilder roman = new StringBuilder();
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] numerals = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+        for (int i = 0; i < values.length; i++) {
+            while (number >= values[i]) {
+                number -= values[i];
+                roman.append(numerals[i]);
+            }
+        }
+
+        return roman.toString();
     }
 } 
