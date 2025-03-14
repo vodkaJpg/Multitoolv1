@@ -51,6 +51,10 @@ public class MessageManager {
         return getMessage("messages.commands." + path);
     }
 
+    public String getCommandMessage(String path, Map<String, String> replacements) {
+        return getMessage("messages.commands." + path, replacements);
+    }
+
     public String getError(String path) {
         return getMessage("messages.errors." + path);
     }
