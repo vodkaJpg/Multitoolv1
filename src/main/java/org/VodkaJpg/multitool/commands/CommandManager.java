@@ -1,7 +1,6 @@
 package org.VodkaJpg.multitool.commands;
 
 import org.VodkaJpg.multitool.Multitool;
-import org.VodkaJpg.multitool.enchants.TelekineticEnchant;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -152,22 +151,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return;
         }
 
-        switch (enchantName) {
-            case "telekinetic":
-                if (level > plugin.getTelekineticEnchant().getMaxLevel()) {
-                    player.sendMessage(plugin.getMessageManager().getError("invalid_level"));
-                    return;
-                }
-                plugin.getItemUtils().addCustomEnchant(item, plugin.getTelekineticEnchant(), level);
-                player.sendMessage(plugin.getMessageManager().getSuccess("enchant_added", Map.of(
-                    "enchant", "Telekinetic",
-                    "level", String.valueOf(level)
-                )));
-                break;
-            default:
-                player.sendMessage(plugin.getMessageManager().getError("invalid_enchant"));
-                break;
-        }
+
     }
 
     private void sendHelp(Player player) {
