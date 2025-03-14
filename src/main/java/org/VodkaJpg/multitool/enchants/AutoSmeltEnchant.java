@@ -4,17 +4,15 @@ import org.VodkaJpg.multitool.Multitool;
 import org.VodkaJpg.multitool.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.NamespacedKey;
-import net.kyori.adventure.text.Component;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AutoSmeltEnchant extends Enchant implements Listener {
+public class AutoSmeltEnchant extends Enchant {
     private final Map<Material, Material> smeltMap;
 
     public AutoSmeltEnchant() {
@@ -37,8 +35,8 @@ public class AutoSmeltEnchant extends Enchant implements Listener {
 
   
 
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
+    @Override
+    public void playerBreakBlock(BlockBreakEvent event) {
         if (event.isCancelled()) return;
         
         Block block = event.getBlock();
@@ -52,4 +50,4 @@ public class AutoSmeltEnchant extends Enchant implements Listener {
         event.setExpToDrop(0);
         block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smeltMap.get(blockType)));
     }
-} 
+} das
