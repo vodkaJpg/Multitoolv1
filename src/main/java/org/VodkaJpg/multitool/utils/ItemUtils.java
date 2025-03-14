@@ -53,9 +53,7 @@ public class ItemUtils {
         ConfigurationSection levelConfig = plugin.getMultitoolConfig().getConfigurationSection("levels." + toolLevel);
         if (levelConfig == null) return item;
         
-        List<String> lore = new ArrayList<>();
-        
-        // Dodaj enchanty bezpośrednio (bez używania namespacedkeys)
+        // Dodaj enchanty bezpośrednio
         plugin.getLogger().info("Dodaję enchanty bezpośrednio dla poziomu " + toolLevel);
         
         // Efektywność
@@ -76,30 +74,12 @@ public class ItemUtils {
         meta.addEnchant(Enchantment.UNBREAKING, toolLevel, true);
         plugin.getLogger().info("Dodano Unbreaking " + toolLevel);
         
-        // Dodaj sekcję enchantów w lore
-        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantments_title"));
-        
-        // Wyświetl enchanty w lore
-        if (efficiencyLevel > 0) {
-            Map<String, String> enchantReplacements = new HashMap<>();
-            enchantReplacements.put("enchantment", "Efficiency " + toRomanNumeral(efficiencyLevel));
-            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
-        }
-        
-        if (fortuneLevel > 0) {
-            Map<String, String> enchantReplacements = new HashMap<>();
-            enchantReplacements.put("enchantment", "Fortune " + toRomanNumeral(fortuneLevel));
-            lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
-        }
-        
-        Map<String, String> enchantReplacements = new HashMap<>();
-        enchantReplacements.put("enchantment", "Unbreaking " + toRomanNumeral(toolLevel));
-        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", enchantReplacements));
+        // Przygotuj lore
+        List<String> lore = new ArrayList<>();
         
         // Dodaj sekcję bonusów
         List<String> bonuses = levelConfig.getStringList("bonuses");
         if (!bonuses.isEmpty()) {
-            lore.add("");
             lore.add(plugin.getMessageManager().getItemMessage("lore.bonuses_title"));
             for (String bonus : bonuses) {
                 Map<String, String> bonusReplacements = new HashMap<>();
@@ -109,7 +89,7 @@ public class ItemUtils {
         }
         
         // Dodaj informacje o blokach
-        lore.add("");
+        if (!lore.isEmpty()) lore.add("");
         Map<String, String> blocksReplacements = new HashMap<>();
         blocksReplacements.put("blocks", formatNumber(blocksMined));
         blocksReplacements.put("required_blocks", formatNumber(levelConfig.getLong("required_blocks")));
