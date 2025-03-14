@@ -52,4 +52,14 @@ messages:
   # Plugin
   plugin:
     enabled: "Plugin został włączony!"
-    disabled: "Plugin został wyłączony!" 
+    disabled: "Plugin został wyłączony!"
+
+enchants:
+  auto-smelt:
+    name: Auto-Smelt
+    description: Automatycznie przetapia wykopane rudy
+    max-level: 1
+    rarity: RARE
+    target: TOOL
+    tradeable: true
+    discoverable: true 

@@ -241,4 +241,18 @@ public class ItemUtils {
         }
         return 0;
     }
+
+    public static boolean hasEnchant(ItemStack item, Enchant enchant) {
+        if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+            return false;
+        }
+        
+        for (String line : item.getItemMeta().getLore()) {
+            String strippedLine = ChatColor.stripColor(line);
+            if (strippedLine.startsWith(enchant.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 } 

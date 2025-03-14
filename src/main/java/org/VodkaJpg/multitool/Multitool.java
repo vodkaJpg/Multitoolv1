@@ -6,6 +6,7 @@ import org.VodkaJpg.multitool.managers.MessageManager;
 import org.VodkaJpg.multitool.utils.ItemUtils;
 
 import org.VodkaJpg.multitool.enchants.TelekineticEnchant;
+import org.VodkaJpg.multitool.enchants.AutoSmeltEnchant;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,14 +29,20 @@ public class Multitool extends JavaPlugin {
     private ItemUtils itemUtils;
  
     private TelekineticEnchant telekineticEnchant;
+    private AutoSmeltEnchant autoSmeltEnchant;
 
     @Override
     public void onEnable() {
         instance = this;
         
         // Zarejestruj enchant Auto-Smelt
+        try {
+            autoSmeltEnchant = new AutoSmeltEnchant();
+            getServer().getPluginManager().registerEvents(autoSmeltEnchant, this);
+        } catch (Exception e) {
+            getLogger().severe("Nie udało się zarejestrować enchantu Auto-Smelt: " + e.getMessage());
+        }
         
-
         // Zarejestruj enchant Lifesteal
         
         // Zarejestruj enchant Telekinetic
@@ -136,6 +143,10 @@ public class Multitool extends JavaPlugin {
 
     public TelekineticEnchant getTelekineticEnchant() {
         return telekineticEnchant;
+    }
+
+    public AutoSmeltEnchant getAutoSmeltEnchant() {
+        return autoSmeltEnchant;
     }
 
 }
