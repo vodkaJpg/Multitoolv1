@@ -21,3 +21,21 @@ permissions:
   multitool.prestige:
     description: Pozwala na używanie komendy prestiżu Multitool
     default: op
+
+enchants:
+  lifesteal:
+    name: Lifesteal
+    description: Leczy gracza podczas atakowania przeciwników
+    max-level: 3
+    rarity: UNCOMMON
+    target: WEAPON
+    tradeable: true
+    discoverable: true
+  telekinetic:
+    name: Telekinetic
+    description: Automatycznie zbiera przedmioty do ekwipunku
+    max-level: 1
+    rarity: RARE
+    target: TOOL
+    tradeable: true
+    discoverable: true

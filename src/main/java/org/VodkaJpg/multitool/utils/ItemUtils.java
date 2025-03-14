@@ -1,6 +1,7 @@
 package org.VodkaJpg.multitool.utils;
 
 import org.VodkaJpg.multitool.Multitool;
+import org.VodkaJpg.multitool.enchants.Enchant;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -69,10 +70,6 @@ public class ItemUtils {
             meta.addEnchant(Enchantment.FORTUNE, fortuneLevel, true);
             plugin.getLogger().info("Dodano Fortune " + fortuneLevel);
         }
-        
-        // Niezniszczalność
-        meta.addEnchant(Enchantment.UNBREAKING, toolLevel, true);
-        plugin.getLogger().info("Dodano Unbreaking " + toolLevel);
         
         // Przygotuj lore
         List<String> lore = new ArrayList<>();
@@ -196,5 +193,52 @@ public class ItemUtils {
         }
 
         return roman.toString();
+    }
+
+    public void addCustomEnchant(ItemStack item, Enchant enchant, int level) {
+        if (item == null || item.getType().isAir()) return;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
+        List<String> lore = meta.getLore();
+        if (lore == null) lore = new ArrayList<>();
+
+        // Usuń stary enchant jeśli istnieje
+        lore.removeIf(line -> line.contains(enchant.getName()));
+
+        // Dodaj nowy enchant
+        lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", Map.of(
+            "enchantment", enchant.getName() + " " + toRomanNumeral(level)
+        )));
+
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+    }
+
+    public boolean hasCustomEnchant(ItemStack item, Enchant enchant) {
+        if (item == null || item.getType().isAir()) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasLore()) return false;
+
+        return meta.getLore().stream()
+                .anyMatch(line -> line.contains(enchant.getName()));
+    }
+
+    public int getCustomEnchantLevel(ItemStack item, Enchant enchant) {
+        if (!hasCustomEnchant(item, enchant)) return 0;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasLore()) return 0;
+
+        for (String line : meta.getLore()) {
+            if (line.contains(enchant.getName())) {
+                try {
+                    String levelStr = line.split(enchant.getName() + " ")[1];
+                    return Utils.romanNumeralToInt(levelStr);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        }
+        return 0;
     }
 } 

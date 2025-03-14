@@ -1,35 +1,40 @@
 messages:
-  prefix: "&6[Multitool]"
+  prefix: "&8[&bMultitool&8]"
   
   # Komendy
   commands:
     help: |
-      &6=== Multitool - Pomoc ===
-      &e/multitool give [gracz] [poziom] &7- Daj Multitool
-      &e/multitool prestige &7- Awansuj na poziom prestiżowy
-      &e/multitool reload &7- Przeładuj konfigurację
-    give: "&7Użycie: &e/multitool give <poziom> [gracz]"
-    prestige: "&7Użycie: &e/multitool prestige"
-    reload: "&7Użycie: &e/multitool reload"
+      &8&m----------------&8[&bMultitool&8]&m----------------
+      &b/mt give <poziom> [gracz] &8- &7Daje Multitool
+      &b/mt prestige &8- &7Prestiżuje Multitool
+      &b/mt reload &8- &7Przeładowuje konfigurację
+      &b/mt enchant <enchant> <poziom> &8- &7Dodaje enchant do przedmiotu
+      &8&m----------------------------------------
+    give: "&cUżycie: /mt give <poziom> [gracz]"
+    prestige: "&cUżycie: /mt prestige"
+    reload: "&cUżycie: /mt reload"
+    enchant: "&cUżycie: /mt enchant <enchant> <poziom>"
   
   # Błędy
   errors:
     player_only: "&cTa komenda może być użyta tylko przez gracza!"
     no_permission: "&cNie masz uprawnień do użycia tej komendy!"
     player_not_found: "&cNie znaleziono gracza!"
-    invalid_level: "&cNieprawidłowy poziom! Dostępne poziomy: 1-7"
-    already_has_multitool: "&cTen gracz już posiada Multitool!"
-    no_multitool: "&cNie posiadasz Multitool!"
-    max_level: "&cOsiągnąłeś maksymalny poziom Multitool!"
+    invalid_level: "&cNieprawidłowy poziom!"
+    no_item: "&cMusisz trzymać przedmiot w ręce!"
+    invalid_enchant: "&cNieprawidłowy enchant!"
+    no_multitool: "&cMusisz trzymać Multitool w ręce!"
+    max_level: "&cOsiągnąłeś maksymalny poziom!"
     max_prestige: "&cOsiągnąłeś maksymalny poziom prestiżu!"
   
   # Sukces
   success:
-    give: "&aPomyślnie nadano Multitool poziom &e{level} &agraczowi &e{player}&a!"
-    received: "&aOtrzymałeś Multitool poziom &e{level}&a!"
-    prestige: "&aGratulacje! Twój Multitool awansował na poziom &e{level}&a!"
+    give: "&aPomyślnie dano Multitool poziomu &e%level% &agraczowi &e%player%"
+    received: "&aOtrzymałeś Multitool poziomu &e%level%"
+    prestige: "&aPomyślnie prestiżowałeś Multitool do poziomu &e%level%"
     reload: "&aPomyślnie przeładowano konfigurację!"
     level_up: "&aGratulacje! Twój Multitool awansował na poziom &e{level}&a!"
+    enchant_added: "&aPomyślnie dodano enchant &e%enchant% &alevelu &e%level%"
   
   # Informacje o przedmiocie
   item:

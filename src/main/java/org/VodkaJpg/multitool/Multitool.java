@@ -4,9 +4,13 @@ import org.VodkaJpg.multitool.commands.CommandManager;
 import org.VodkaJpg.multitool.listeners.MultitoolListener;
 import org.VodkaJpg.multitool.managers.MessageManager;
 import org.VodkaJpg.multitool.utils.ItemUtils;
+
+import org.VodkaJpg.multitool.enchants.TelekineticEnchant;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +26,21 @@ public class Multitool extends JavaPlugin {
     private CommandManager commandManager;
     private MessageManager messageManager;
     private ItemUtils itemUtils;
+ 
+    private TelekineticEnchant telekineticEnchant;
 
     @Override
     public void onEnable() {
         instance = this;
+        
+        // Zarejestruj enchant Auto-Smelt
+        
+
+        // Zarejestruj enchant Lifesteal
+        
+        // Zarejestruj enchant Telekinetic
+        telekineticEnchant = new TelekineticEnchant();
+        getLogger().info("Pomyślnie zarejestrowano enchant Telekinetic");
         
         // Zapisz domyślne pliki konfiguracyjne
         saveDefaultConfig();
@@ -44,6 +59,7 @@ public class Multitool extends JavaPlugin {
         
         // Zarejestruj nasłuchiwacze
         getServer().getPluginManager().registerEvents(new MultitoolListener(this), this);
+        getServer().getPluginManager().registerEvents(telekineticEnchant, this);
         
         // Zarejestruj komendy
         getCommand("multitool").setExecutor(commandManager);
@@ -55,6 +71,8 @@ public class Multitool extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        
+        
         if (messageManager != null) {
             getLogger().info(messageManager.getPrefix() + " " + messageManager.getMessage("messages.plugin.disabled"));
         } else {
@@ -114,4 +132,10 @@ public class Multitool extends JavaPlugin {
     public CommandManager getCommandManager() {
         return commandManager;
     }
+
+
+    public TelekineticEnchant getTelekineticEnchant() {
+        return telekineticEnchant;
+    }
+
 }
