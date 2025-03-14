@@ -18,9 +18,9 @@ public class MessageManager {
     }
 
     public String getMessage(String path) {
-        String message = messages.getString(path);
+        String message = messages.getString("messages." + path);
         if (message == null) {
-            return "§cNie znaleziono wiadomości: " + path;
+            return "§cNie znaleziono wiadomości: messages." + path;
         }
         return colorize(message);
     }
@@ -29,6 +29,7 @@ public class MessageManager {
         String message = getMessage(path);
         if (replacements != null) {
             for (Map.Entry<String, String> replacement : replacements.entrySet()) {
+                message = message.replace("%" + replacement.getKey() + "%", replacement.getValue());
                 message = message.replace("{" + replacement.getKey() + "}", replacement.getValue());
             }
         }
@@ -36,35 +37,35 @@ public class MessageManager {
     }
 
     public String getSuccess(String path) {
-        return getMessage("messages.success." + path);
+        return getMessage("success." + path);
     }
 
     public String getSuccess(String path, Map<String, String> replacements) {
-        return getMessage("messages.success." + path, replacements);
+        return getMessage("success." + path, replacements);
     }
 
     public String getPrefix() {
-        return getMessage("messages.prefix");
+        return getMessage("prefix");
     }
 
     public String getCommandMessage(String path) {
-        return getMessage("messages.commands." + path);
+        return getMessage("commands." + path);
     }
 
     public String getCommandMessage(String path, Map<String, String> replacements) {
-        return getMessage("messages.commands." + path, replacements);
+        return getMessage("commands." + path, replacements);
     }
 
     public String getError(String path) {
-        return getMessage("messages.errors." + path);
+        return getMessage("errors." + path);
     }
 
     public String getItemMessage(String path) {
-        return getMessage("messages.item." + path);
+        return getMessage("item." + path);
     }
 
     public String getItemMessage(String path, Map<String, String> replacements) {
-        return getMessage("messages.item." + path, replacements);
+        return getMessage("item." + path, replacements);
     }
 
     private String colorize(String message) {
