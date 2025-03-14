@@ -4,10 +4,8 @@ import org.VodkaJpg.multitool.Multitool;
 import org.VodkaJpg.multitool.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +31,6 @@ public class AutoSmeltEnchant extends Enchant {
         smeltMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
     }
 
-  
-
     @Override
     public void playerBreakBlock(BlockBreakEvent event) {
         if (event.isCancelled()) return;
@@ -50,4 +46,4 @@ public class AutoSmeltEnchant extends Enchant {
         event.setExpToDrop(0);
         block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smeltMap.get(blockType)));
     }
-} das
+}

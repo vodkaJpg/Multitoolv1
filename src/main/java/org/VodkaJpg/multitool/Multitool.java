@@ -9,13 +9,11 @@ import org.VodkaJpg.multitool.enchants.AutoSmeltEnchant;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
+
 
 import java.io.File;
-import java.io.IOException;
+
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.Random;
 
 public class Multitool extends JavaPlugin {
@@ -32,17 +30,10 @@ public class Multitool extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        
-        // Zarejestruj enchant Auto-Smelt
-        try {
-            autoSmeltEnchant = new AutoSmeltEnchant();
-            getServer().getPluginManager().registerEvents(autoSmeltEnchant, this);
-        } catch (Exception e) {
-            getLogger().severe("Nie udało się zarejestrować enchantu Auto-Smelt: " + e.getMessage());
-        }
-        
-        // Zarejestruj enchant Lifesteal
-        
+            buildEnchants();
+
+    
+        //costam
         // Zapisz domyślne pliki konfiguracyjne
         saveDefaultConfig();
         saveResource("messages.yml", false);
@@ -59,6 +50,8 @@ public class Multitool extends JavaPlugin {
         commandManager = new CommandManager(this);
         
         // Zarejestruj nasłuchiwacze
+        // Enchanter enchanter = new Enchanter();
+        // getServer().getPluginCommand("enchanter").setExecutor(enchanter);
         getServer().getPluginManager().registerEvents(new MultitoolListener(this), this);
         
         // Zarejestruj komendy
@@ -133,10 +126,7 @@ public class Multitool extends JavaPlugin {
         return commandManager;
     }
 
-
-   
-    public AutoSmeltEnchant getAutoSmeltEnchant() {
-        return autoSmeltEnchant;
+    private void buildEnchants() {
+        new AutoSmeltEnchant();
     }
-
-}
+} 
