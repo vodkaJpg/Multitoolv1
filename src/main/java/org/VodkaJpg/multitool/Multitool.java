@@ -5,7 +5,6 @@ import org.VodkaJpg.multitool.listeners.MultitoolListener;
 import org.VodkaJpg.multitool.managers.MessageManager;
 import org.VodkaJpg.multitool.utils.ItemUtils;
 
-import org.VodkaJpg.multitool.enchants.TelekineticEnchant;
 import org.VodkaJpg.multitool.enchants.AutoSmeltEnchant;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,7 +27,6 @@ public class Multitool extends JavaPlugin {
     private MessageManager messageManager;
     private ItemUtils itemUtils;
  
-    private TelekineticEnchant telekineticEnchant;
     private AutoSmeltEnchant autoSmeltEnchant;
 
     @Override
@@ -44,10 +42,6 @@ public class Multitool extends JavaPlugin {
         }
         
         // Zarejestruj enchant Lifesteal
-        
-        // Zarejestruj enchant Telekinetic
-        telekineticEnchant = new TelekineticEnchant();
-        getLogger().info("Pomyślnie zarejestrowano enchant Telekinetic");
         
         // Zapisz domyślne pliki konfiguracyjne
         saveDefaultConfig();
@@ -66,7 +60,6 @@ public class Multitool extends JavaPlugin {
         
         // Zarejestruj nasłuchiwacze
         getServer().getPluginManager().registerEvents(new MultitoolListener(this), this);
-        getServer().getPluginManager().registerEvents(telekineticEnchant, this);
         
         // Zarejestruj komendy
         getCommand("multitool").setExecutor(commandManager);
@@ -141,10 +134,7 @@ public class Multitool extends JavaPlugin {
     }
 
 
-    public TelekineticEnchant getTelekineticEnchant() {
-        return telekineticEnchant;
-    }
-
+   
     public AutoSmeltEnchant getAutoSmeltEnchant() {
         return autoSmeltEnchant;
     }
