@@ -12,10 +12,12 @@ import java.util.Map;
 
 public class AutoSmeltEnchant extends Enchant {
     private final Map<Material, Material> smeltMap;
+    private final Multitool plugin;
 
-    public AutoSmeltEnchant() {
+    public AutoSmeltEnchant(Multitool plugin) {
         super("Auto-Smelt", 1, Rarity.RARE, new ItemSet[]{ItemSet.TOOL}, "Automatycznie przetapia wykopane rudy", 100, 0);
         this.smeltMap = new HashMap<>();
+        this.plugin = plugin;
         initializeSmeltMap();
     }
 
@@ -41,7 +43,9 @@ public class AutoSmeltEnchant extends Enchant {
         if (!smeltMap.containsKey(blockType)) return;
 
         ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
-        if (!ItemUtils.hasEnchant(tool, this)) return;
+
+        if (!plugin.getItemUtils().hasCustomEnchant(tool, this)) return;
+        
 
         event.setExpToDrop(0);
         block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smeltMap.get(blockType)));

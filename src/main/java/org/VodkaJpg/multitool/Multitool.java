@@ -30,8 +30,8 @@ public class Multitool extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        buildEnchants();
 
+        buildEnchants();
 
         //costam
         // Zapisz domyślne pliki konfiguracyjne
@@ -127,10 +127,13 @@ public class Multitool extends JavaPlugin {
     }
 
     private void buildEnchants() {
-        autoSmeltEnchant = new AutoSmeltEnchant();
+
+        autoSmeltEnchant = new AutoSmeltEnchant(this);
+
     }
 
     public AutoSmeltEnchant getAutoSmeltEnchant() {
         return autoSmeltEnchant;
     }
+
 }
