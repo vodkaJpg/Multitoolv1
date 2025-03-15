@@ -18,16 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.Arrays;
 
 public class ItemUtils {
     private final Multitool plugin;
     private final NamespacedKey toolIdKey;
     private final NamespacedKey blocksMineKey;
+    private final NamespacedKey enchantKey;
 
     public ItemUtils(Multitool plugin) {
         this.plugin = plugin;
         this.toolIdKey = new NamespacedKey(plugin, "tool_id");
         this.blocksMineKey = new NamespacedKey(plugin, "blocks_mined");
+        this.enchantKey = new NamespacedKey(plugin, "enchants");
     }
 
     public ItemStack createMultitool(int level) {
@@ -200,13 +203,15 @@ public class ItemUtils {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
 
+        // Dodaj enchant do PersistentDataContainer
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String enchantData = enchant.getName() + ":" + level;
+        container.set(enchantKey, PersistentDataType.STRING, enchantData);
+
+        // Dodaj tekst do lore
         List<String> lore = meta.getLore();
         if (lore == null) lore = new ArrayList<>();
-
-        // Usuń stary enchant jeśli istnieje
         lore.removeIf(line -> line.contains(enchant.getName()));
-
-        // Dodaj nowy enchant
         lore.add(plugin.getMessageManager().getItemMessage("lore.enchantment", Map.of(
             "enchantment", enchant.getName() + " " + toRomanNumeral(level)
         )));
@@ -218,28 +223,27 @@ public class ItemUtils {
     public boolean hasCustomEnchant(ItemStack item, Enchant enchant) {
         if (item == null || item.getType().isAir()) return false;
         ItemMeta meta = item.getItemMeta();
-        if (meta == null || !meta.hasLore()) return false;
+        if (meta == null) return false;
 
-        return meta.getLore().stream()
-                .anyMatch(line -> line.contains(enchant.getName()));
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String enchantData = container.get(enchantKey, PersistentDataType.STRING);
+        return enchantData != null && enchantData.startsWith(enchant.getName() + ":");
     }
 
     public int getCustomEnchantLevel(ItemStack item, Enchant enchant) {
         if (!hasCustomEnchant(item, enchant)) return 0;
         ItemMeta meta = item.getItemMeta();
-        if (meta == null || !meta.hasLore()) return 0;
+        if (meta == null) return 0;
 
-        for (String line : meta.getLore()) {
-            if (line.contains(enchant.getName())) {
-                try {
-                    String levelStr = line.split(enchant.getName() + " ")[1];
-                    return Utils.romanNumeralToInt(levelStr);
-                } catch (Exception e) {
-                    return 0;
-                }
-            }
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String enchantData = container.get(enchantKey, PersistentDataType.STRING);
+        if (enchantData == null) return 0;
+
+        try {
+            return Integer.parseInt(enchantData.split(":")[1]);
+        } catch (Exception e) {
+            return 0;
         }
-        return 0;
     }
 
     public static boolean hasEnchant(ItemStack item, Enchant enchant) {

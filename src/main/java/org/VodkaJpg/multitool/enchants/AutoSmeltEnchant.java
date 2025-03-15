@@ -46,4 +46,8 @@ public class AutoSmeltEnchant extends Enchant {
         event.setExpToDrop(0);
         block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(smeltMap.get(blockType)));
     }
+
+    public Map<Material, Material> getSmeltMap() {
+        return smeltMap;
+    }
 }

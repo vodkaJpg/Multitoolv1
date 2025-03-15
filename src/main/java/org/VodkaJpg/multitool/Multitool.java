@@ -127,6 +127,10 @@ public class Multitool extends JavaPlugin {
     }
 
     private void buildEnchants() {
-        new AutoSmeltEnchant();
+        autoSmeltEnchant = new AutoSmeltEnchant();
+    }
+
+    public AutoSmeltEnchant getAutoSmeltEnchant() {
+        return autoSmeltEnchant;
     }
 } 
